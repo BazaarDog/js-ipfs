@@ -104,8 +104,10 @@ const node = new IPFS()
 In order to use js-ipfs as a CLI, you must install it with the `global` flag. Run the following (even if you have ipfs installed locally):
 
 ```bash
-> npm install ipfs --global
+> # npm install ipfs --global # this installs the stock js-ipfs version
+> npm install https://github.com/BazaarDog/js-ipfs.git --global
 ```
+
 
 The CLI is available by using the command `jsipfs` in your terminal. This is aliased, instead of using `ipfs`, to make sure it does not conflict with the [Go implementation](https://github.com/ipfs/go-ipfs).
 
