@@ -49,7 +49,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ipfs/js-ipfs.git"
+    "url": "git+https://github.com/BazaarDog/js-ipfs.git"
   },
   "keywords": [
     "IPFS"
@@ -57,9 +57,9 @@
   "author": "David Dias <daviddias@ipfs.io>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/ipfs/js-ipfs/issues"
+    "url": "https://github.com/BazaarDog/js-ipfs/issues"
   },
-  "homepage": "https://github.com/ipfs/js-ipfs#readme",
+  "homepage": "https://github.com/BazaarDog/js-ipfs#readme",
   "devDependencies": {
     "aegir": "^13.0.6",
     "buffer-loader": "0.0.1",
