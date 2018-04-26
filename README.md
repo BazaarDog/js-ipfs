@@ -58,7 +58,6 @@ You can check the development status at the [Waffle Board](https://waffle.io/ipf
   - [IPFS CLI](#ipfs-cli)
   - [IPFS Daemon](#ipfs-daemon)
   - [IPFS Module (use IPFS as a module in Node.js or in the Browser)](#ipfs-module)
-    - [How to create a IPFS node instance](#create-a-ipfs-node-instance)
   - [Tutorials and Examples](#tutorials-and-examples)
   - [API Docs](#api)
     - [Constructor](#ipfs-constructor)
@@ -110,8 +109,7 @@ const node = new IPFS()
 In order to use js-ipfs as a CLI, you must install it with the `global` flag. Run the following (even if you have ipfs installed locally):
 
 ```bash
-> # npm install ipfs --global # this installs the stock js-ipfs version
-> npm install https://github.com/BazaarDog/js-ipfs.git --global
+> npm install ipfs --global
 ```
 
 The CLI is available by using the command `jsipfs` in your terminal. This is aliased, instead of using `ipfs`, to make sure it does not conflict with the [Go implementation](https://github.com/ipfs/go-ipfs).
@@ -203,7 +201,7 @@ Creates and returns an instance of an IPFS node. Use the `options` argument to s
 - `repo` (string or [`ipfs.Repo`](https://github.com/ipfs/js-ipfs-repo) instance): The file path at which to store the IPFS node’s data. Alternatively, you can set up a customized storage system by providing an [`ipfs.Repo`](https://github.com/ipfs/js-ipfs-repo) instance. (Default: `'~/.jsipfs'` in Node.js, `'ipfs'` in browsers.)
 
     Example:
-
+    
     ```js
     // Store data outside your user directory
     const node = new IPFS({ repo: '/var/ipfs/data' })
@@ -212,12 +210,16 @@ Creates and returns an instance of an IPFS node. Use the `options` argument to s
 - `init` (boolean or object): Initialize the repo when creating the IPFS node. (Default: `true`)
 
     If you have already initialized a repo before creating your IPFS node (e.g. you are loading a repo that was saved to disk from a previous run of your program), you must make sure to set this to `false`. Note that *initializing* a repo is different from creating an instance of [`ipfs.Repo`](https://github.com/ipfs/js-ipfs-repo). The IPFS constructor sets many special properties when initializing a repo, so you should usually not try and call `repoInstance.init()` yourself.
+    
+    Instead of a boolean, you may provide an object with custom initialization options. All properties are optional:
 
-    Instead of a boolean, you may provide an object with custom initialization options.
-
+    - `init.emptyRepo` (boolean) Whether to remove built-in assets, like the instructional tour and empty mutable file system, from the repo. (Default: `false`)
+    - `init.bits` (number) Number of bits to use in the generated key pair. (Default: `2048`)
+    - `init.pass` (string) A passphrase to encrypt keys. You should generally use the top-level `pass` option instead of the `init.pass` option (this one will take its value from the top-level option if not set).
+    
 - `start` (boolean): If `false`, do not automatically start the IPFS node. Instead, you’ll need to manually call `node.start()` yourself. (Default: `true`)
 
-- `pass` (string): A passphrase to encrypt your keys.
+- `pass` (string): A passphrase to encrypt/decrypt your keys.
 
 - `EXPERIMENTAL` (object): Enable and configure experimental features.
     - `pubsub` (boolean): Enable libp2p pub-sub. (Default: `false`)
@@ -228,9 +230,9 @@ Creates and returns an instance of an IPFS node. Use the `options` argument to s
         - `hop` (object)
             - `enabled` (boolean): Make this node a relay (other nodes can connect *through* it). (Default: `false`)
             - `active` (boolean): Make this an *active* relay node. Active relay nodes will attempt to dial a destination peer even if that peer is not yet connected to the relay. (Default: `false`)
-
+            
 - `config` (object) Modify the default IPFS node config. Find the Node.js defaults at [`src/core/runtime/config-nodejs.json`](https://github.com/ipfs/js-ipfs/tree/master/src/core/runtime/config-nodejs.json) and the browser defaults at [`src/core/runtime/config-browser.json`](https://github.com/ipfs/js-ipfs/tree/master/src/core/runtime/config-browser.json). This object will be *merged* with the default config; it will not replace it.
-
+  
 - `libp2p` (object) add custom modules to the libp2p stack of your node
     - `modules` (object):
         - `transport` (Array<[libp2p.Transport](https://github.com/libp2p/interface-transport)>): An array of additional Libp2p transport instances to use. See [libp2p/interface-transport](https://github.com/libp2p/interface-transport) for details.
@@ -310,12 +312,12 @@ This method is asynchronous. There are several ways to be notified when the node
 const node = new IPFS()
 node.on('ready', () => {
   console.log('Node is ready to use!')
-
+  
   // Stop with a promise:
   node.stop()
     .then(() => console.log('Node stopped!'))
     .catch(error => console.error('Node failed to stop cleanly!', error))
-
+  
   // OR use a callback:
   node.stop(error => {
     if (error) {
@@ -324,7 +326,7 @@ node.on('ready', () => {
     }
     console.log('Node stopped!')
   })
-
+  
   // OR use events:
   node.on('error', error => console.error('Something went terribly wrong!', error))
   node.stop()
