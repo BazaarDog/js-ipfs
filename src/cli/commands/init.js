@@ -10,18 +10,20 @@ module.exports = {
 
   describe: 'Initialize a local IPFS node',
 
-  builder: {
-    bits: {
-      type: 'number',
-      alias: 'b',
-      default: '2048',
-      describe: 'Number of bits to use in the generated RSA private key (defaults to 2048)'
-    },
-    emptyRepo: {
-      alias: 'e',
-      type: 'boolean',
-      describe: "Don't add and pin help files to the local storage"
-    }
+  builder (yargs) {
+    return yargs
+      .epilog(utils.ipfsPathHelp)
+      .option('bits', {
+        type: 'number',
+        alias: 'b',
+        default: '2048',
+        describe: 'Number of bits to use in the generated RSA private key (defaults to 2048)'
+      })
+      .option('emptyRepo', {
+        alias: 'e',
+        type: 'boolean',
+        describe: "Don't add and pin help files to the local storage"
+      })
   },
 
   handler (argv) {
