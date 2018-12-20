@@ -51,16 +51,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ipfs/js-ipfs.git"
+    "url": "git+https://github.com/BazaarDog/js-ipfs.git"
   },
   "keywords": [
     "IPFS"
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/ipfs/js-ipfs/issues"
+    "url": "https://github.com/BazaarDog/js-ipfs/issues"
   },
-  "homepage": "https://github.com/ipfs/js-ipfs#readme",
+  "homepage": "https://github.com/BazaarDog/js-ipfs#readme",
   "devDependencies": {
     "aegir": "^17.0.1",
     "chai": "^4.2.0",
@@ -105,7 +105,7 @@
     "hoek": "^6.1.2",
     "human-to-milliseconds": "^1.0.0",
     "interface-datastore": "~0.6.0",
-    "ipfs-bitswap": "~0.21.0",
+    "ipfs-bitswap": "git://github.com/BazaarDog/js-ipfs-bitswap.git#083d6669514876330d7bc0de6ec49568e519102c",
     "ipfs-block": "~0.8.0",
     "ipfs-block-service": "~0.15.1",
     "ipfs-http-client": "^28.1.0",
