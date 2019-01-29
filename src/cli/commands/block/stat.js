@@ -1,23 +1,27 @@
 'use strict'
 
-const CID = require('cids')
-const print = require('../../utils').print
+const multibase = require('multibase')
+const { print } = require('../../utils')
+const { cidToString } = require('../../../utils/cid')
 
 module.exports = {
   command: 'stat <key>',
 
   describe: 'Print information of a raw IPFS block',
 
-  builder: {},
+  builder: {
+    'cid-base': {
+      describe: 'Number base to display CIDs in.',
+      type: 'string',
+      choices: multibase.names
+    }
+  },
 
-  handler (argv) {
-    argv.ipfs.block.stat(new CID(argv.key), (err, stats) => {
-      if (err) {
-        throw err
-      }
-
-      print('Key: ' + stats.key)
+  handler ({ ipfs, key, cidBase, resolve }) {
+    resolve((async () => {
+      const stats = await ipfs.block.stat(key)
+      print('Key: ' + cidToString(stats.key, { base: cidBase }))
       print('Size: ' + stats.size)
-    })
+    })())
   }
 }

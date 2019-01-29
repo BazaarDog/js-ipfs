@@ -5,6 +5,7 @@ const PeerInfo = require('peer-info')
 const multiaddr = require('multiaddr')
 const waterfall = require('async/waterfall')
 const Keychain = require('libp2p-keychain')
+const defaultsDeep = require('@nodeutils/defaults-deep')
 const NoKeychain = require('./no-keychain')
 /*
  * Load stuff from Repo into memory
@@ -16,6 +17,21 @@ module.exports = function preStart (self) {
     const pass = self._options.pass
     waterfall([
       (cb) => self._repo.config.get(cb),
+      (config, cb) => {
+        if (!self._options.config) {
+          return cb(null, config)
+        }
+
+        config = defaultsDeep(self._options.config, config)
+
+        self.config.replace(config, (err) => {
+          if (err) {
+            return cb(err)
+          }
+
+          cb(null, config)
+        })
+      },
       (config, cb) => {
         // Create keychain configuration, if needed.
         if (config.Keychain) {
@@ -32,7 +48,7 @@ module.exports = function preStart (self) {
         if (self._keychain) {
           // most likely an init or upgrade has happened
         } else if (pass) {
-          const keychainOptions = Object.assign({passPhrase: pass}, config.Keychain)
+          const keychainOptions = Object.assign({ passPhrase: pass }, config.Keychain)
           self._keychain = new Keychain(self._repo.keys, keychainOptions)
           self.log('keychain constructed')
         } else {
@@ -78,7 +94,8 @@ module.exports = function preStart (self) {
         }
 
         cb()
-      }
+      },
+      (cb) => self.pin._load(cb)
     ], callback)
   }
 }

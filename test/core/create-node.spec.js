@@ -7,6 +7,9 @@ const dirtyChai = require('dirty-chai')
 const expect = chai.expect
 chai.use(dirtyChai)
 const series = require('async/series')
+const sinon = require('sinon')
+const waterfall = require('async/waterfall')
+const parallel = require('async/parallel')
 const os = require('os')
 const path = require('path')
 const hat = require('hat')
@@ -18,6 +21,14 @@ const IPFS = require('../../src/core')
 const createTempRepo = require('../utils/create-repo-nodejs.js')
 
 describe('create node', function () {
+  let tempRepo
+
+  beforeEach(() => {
+    tempRepo = createTempRepo()
+  })
+
+  afterEach((done) => tempRepo.teardown(done))
+
   it('custom repoPath', function (done) {
     this.timeout(80 * 1000)
 
@@ -47,7 +58,7 @@ describe('create node', function () {
     this.timeout(80 * 1000)
 
     const node = new IPFS({
-      repo: createTempRepo(),
+      repo: tempRepo,
       config: {
         Addresses: {
           Swarm: []
@@ -71,7 +82,7 @@ describe('create node', function () {
     this.timeout(80 * 1000)
 
     const node = IPFS.createNode({
-      repo: createTempRepo(),
+      repo: tempRepo,
       config: {
         Addresses: {
           Swarm: []
@@ -98,7 +109,7 @@ describe('create node', function () {
     this.timeout(80 * 1000)
 
     const node = new IPFS({
-      repo: createTempRepo(),
+      repo: tempRepo,
       init: {
         bits: 512
       },
@@ -121,11 +132,28 @@ describe('create node', function () {
     })
   })
 
-  it('init: false errors (start default: true)', function (done) {
+  it('should be silent', function (done) {
+    this.timeout(10 * 1000)
+
+    sinon.spy(console, 'log')
+
+    const ipfs = new IPFS({
+      silent: true,
+      repo: tempRepo
+    })
+
+    ipfs.on('ready', () => {
+      expect(console.log.called).to.be.false()
+      console.log.restore()
+      ipfs.stop(done)
+    })
+  })
+
+  it('init: false errors (start default: true) and errors only once', function (done) {
     this.timeout(80 * 1000)
 
     const node = new IPFS({
-      repo: createTempRepo(),
+      repo: tempRepo,
       init: false,
       config: {
         Addresses: {
@@ -133,17 +161,31 @@ describe('create node', function () {
         }
       }
     })
-    node.once('error', (err) => {
-      expect(err).to.exist()
-      done()
-    })
+
+    const shouldHappenOnce = () => {
+      let timeoutId = null
+
+      return (err) => {
+        expect(err).to.exist()
+
+        // Bad news, this handler has been executed before
+        if (timeoutId) {
+          clearTimeout(timeoutId)
+          return done(new Error('error handler called multiple times'))
+        }
+
+        timeoutId = setTimeout(done, 100)
+      }
+    }
+
+    node.on('error', shouldHappenOnce())
   })
 
   it('init: false, start: false', function (done) {
     this.timeout(80 * 1000)
 
     const node = new IPFS({
-      repo: createTempRepo(),
+      repo: tempRepo,
       init: false,
       start: false,
       config: {
@@ -173,7 +215,7 @@ describe('create node', function () {
     this.timeout(80 * 1000)
 
     const node = new IPFS({
-      repo: createTempRepo(),
+      repo: tempRepo,
       init: true,
       start: false,
       config: {
@@ -195,7 +237,7 @@ describe('create node', function () {
     this.timeout(80 * 1000)
 
     const node = new IPFS({
-      repo: createTempRepo(),
+      repo: tempRepo,
       init: true,
       start: false,
       config: {
@@ -216,7 +258,7 @@ describe('create node', function () {
     if (!isNode) { return done() }
 
     const node = new IPFS({
-      repo: createTempRepo(),
+      repo: tempRepo,
       config: {
         Addresses: {
           Swarm: ['/ip4/127.0.0.1/tcp/9977']
@@ -242,7 +284,7 @@ describe('create node', function () {
     this.timeout(80 * 1000)
 
     const node = new IPFS({
-      repo: createTempRepo(),
+      repo: tempRepo,
       config: {
         Addresses: {
           Swarm: []
@@ -263,7 +305,7 @@ describe('create node', function () {
     this.timeout(80 * 1000)
 
     const node = new IPFS({
-      repo: createTempRepo(),
+      repo: tempRepo,
       config: {
         Addresses: {
           Swarm: []
@@ -283,7 +325,7 @@ describe('create node', function () {
     this.timeout(80 * 1000)
 
     const options = {
-      repo: createTempRepo(),
+      repo: tempRepo,
       config: {
         Addresses: {
           Swarm: []
@@ -304,5 +346,67 @@ describe('create node', function () {
       },
       (cb) => node.stop(cb)
     ], done)
+  })
+
+  it('does not share identity with a simultaneously created node', function (done) {
+    this.timeout(2 * 60 * 1000)
+
+    let _nodeNumber = 0
+    function createNode (repo) {
+      _nodeNumber++
+      return new IPFS({
+        repo,
+        init: { emptyRepo: true },
+        config: {
+          Addresses: {
+            API: `/ip4/127.0.0.1/tcp/${5010 + _nodeNumber}`,
+            Gateway: `/ip4/127.0.0.1/tcp/${9090 + _nodeNumber}`,
+            Swarm: [
+              `/ip4/0.0.0.0/tcp/${4010 + _nodeNumber * 2}`
+            ]
+          },
+          Bootstrap: []
+        }
+      })
+    }
+
+    let repoA
+    let repoB
+    let nodeA
+    let nodeB
+
+    waterfall([
+      (cb) => {
+        repoA = createTempRepo()
+        repoB = createTempRepo()
+        nodeA = createNode(repoA)
+        nodeB = createNode(repoB)
+        cb()
+      },
+      (cb) => parallel([
+        (cb) => nodeA.once('start', cb),
+        (cb) => nodeB.once('start', cb)
+      ], cb),
+      (_, cb) => parallel([
+        (cb) => nodeA.id(cb),
+        (cb) => nodeB.id(cb)
+      ], cb),
+      ([idA, idB], cb) => {
+        expect(idA.id).to.not.equal(idB.id)
+        cb()
+      }
+    ], (error) => {
+      parallel([
+        (cb) => nodeA.stop(cb),
+        (cb) => nodeB.stop(cb)
+      ], (stopError) => {
+        parallel([
+          (cb) => repoA.teardown(cb),
+          (cb) => repoB.teardown(cb)
+        ], (teardownError) => {
+          done(error || stopError || teardownError)
+        })
+      })
+    })
   })
 })

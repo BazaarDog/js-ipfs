@@ -1,6 +1,8 @@
 'use strict'
 
 const waterfall = require('async/waterfall')
+const parallel = require('async/parallel')
+const setImmediate = require('async/setImmediate')
 const promisify = require('promisify-es6')
 const dagPB = require('ipld-dag-pb')
 const DAGNode = dagPB.DAGNode
@@ -8,7 +10,7 @@ const DAGLink = dagPB.DAGLink
 const CID = require('cids')
 const mh = require('multihashes')
 const Unixfs = require('ipfs-unixfs')
-const assert = require('assert')
+const errCode = require('err-code')
 
 function normalizeMultihash (multihash, enc) {
   if (typeof multihash === 'string') {
@@ -19,6 +21,8 @@ function normalizeMultihash (multihash, enc) {
     return Buffer.from(multihash, enc)
   } else if (Buffer.isBuffer(multihash)) {
     return multihash
+  } else if (CID.isCID(multihash)) {
+    return multihash.buffer
   } else {
     throw new Error('unsupported multihash')
   }
@@ -69,6 +73,8 @@ module.exports = function object (self) {
         options = {}
       }
 
+      options = options || {}
+
       waterfall([
         (cb) => {
           self.object.get(multihash, options, cb)
@@ -80,10 +86,19 @@ module.exports = function object (self) {
             if (err) {
               return cb(err)
             }
+
             self._ipld.put(node, {
-              cid: new CID(node.multihash)
-            }, (err) => {
-              cb(err, node)
+              version: 0,
+              hashAlg: 'sha2-256',
+              format: 'dag-pb'
+            }, (err, cid) => {
+              if (err) return cb(err)
+
+              if (options.preload !== false) {
+                self._preload(cid)
+              }
+
+              cb(null, cid)
             })
           })
         }
@@ -92,16 +107,26 @@ module.exports = function object (self) {
   }
 
   return {
-    new: promisify((template, callback) => {
+    new: promisify((template, options, callback) => {
       if (typeof template === 'function') {
         callback = template
         template = undefined
+        options = {}
       }
+
+      if (typeof options === 'function') {
+        callback = options
+        options = {}
+      }
+
+      options = options || {}
 
       let data
 
       if (template) {
-        assert(template === 'unixfs-dir', 'unkown template')
+        if (template !== 'unixfs-dir') {
+          return setImmediate(() => callback(new Error('unknown template')))
+        }
         data = (new Unixfs('directory')).marshal()
       } else {
         data = Buffer.alloc(0)
@@ -111,14 +136,21 @@ module.exports = function object (self) {
         if (err) {
           return callback(err)
         }
+
         self._ipld.put(node, {
-          cid: new CID(node.multihash)
-        }, (err) => {
+          version: 0,
+          hashAlg: 'sha2-256',
+          format: 'dag-pb'
+        }, (err, cid) => {
           if (err) {
             return callback(err)
           }
 
-          callback(null, node)
+          if (options.preload !== false) {
+            self._preload(cid)
+          }
+
+          callback(null, cid)
         })
       })
     }),
@@ -127,6 +159,8 @@ module.exports = function object (self) {
         callback = options
         options = {}
       }
+
+      options = options || {}
 
       const encoding = options.enc
       let node
@@ -149,7 +183,7 @@ module.exports = function object (self) {
             next()
           })
         }
-      } else if (obj.multihash) {
+      } else if (DAGNode.isDAGNode(obj)) {
         // already a dag node
         node = obj
         next()
@@ -167,13 +201,19 @@ module.exports = function object (self) {
 
       function next () {
         self._ipld.put(node, {
-          cid: new CID(node.multihash)
-        }, (err) => {
+          version: 0,
+          hashAlg: 'sha2-256',
+          format: 'dag-pb'
+        }, (err, cid) => {
           if (err) {
             return callback(err)
           }
 
-          self.object.get(node.multihash, callback)
+          if (options.preload !== false) {
+            self._preload(cid)
+          }
+
+          callback(null, cid)
         })
       }
     }),
@@ -184,17 +224,28 @@ module.exports = function object (self) {
         options = {}
       }
 
-      let mh
+      options = options || {}
+
+      let mh, cid
 
       try {
         mh = normalizeMultihash(multihash, options.enc)
       } catch (err) {
-        return callback(err)
+        return setImmediate(() => callback(errCode(err, 'ERR_INVALID_MULTIHASH')))
       }
-      let cid = new CID(mh)
+
+      try {
+        cid = new CID(mh)
+      } catch (err) {
+        return setImmediate(() => callback(errCode(err, 'ERR_INVALID_CID')))
+      }
 
       if (options.cidVersion === 1) {
         cid = cid.toV1()
+      }
+
+      if (options.preload !== false) {
+        self._preload(cid)
       }
 
       self._ipld.get(cid, (err, result) => {
@@ -202,9 +253,7 @@ module.exports = function object (self) {
           return callback(err)
         }
 
-        const node = result.value
-
-        callback(null, node)
+        callback(null, result.value)
       })
     }),
 
@@ -244,29 +293,32 @@ module.exports = function object (self) {
         options = {}
       }
 
-      self.object.get(multihash, options, (err, node) => {
+      options = options || {}
+
+      waterfall([
+        (cb) => self.object.get(multihash, options, cb),
+        (node, cb) => {
+          parallel({
+            serialized: (next) => dagPB.util.serialize(node, next),
+            cid: (next) => dagPB.util.cid(node, next),
+            node: (next) => next(null, node)
+          }, cb)
+        }
+      ], (err, result) => {
         if (err) {
           return callback(err)
         }
 
-        dagPB.util.serialize(node, (err, serialized) => {
-          if (err) {
-            return callback(err)
-          }
+        const blockSize = result.serialized.length
+        const linkLength = result.node.links.reduce((a, l) => a + l.size, 0)
 
-          const blockSize = serialized.length
-          const linkLength = node.links.reduce((a, l) => a + l.size, 0)
-
-          const nodeJSON = node.toJSON()
-
-          callback(null, {
-            Hash: nodeJSON.multihash,
-            NumLinks: node.links.length,
-            BlockSize: blockSize,
-            LinksSize: blockSize - node.data.length,
-            DataSize: node.data.length,
-            CumulativeSize: blockSize + linkLength
-          })
+        callback(null, {
+          Hash: result.cid.toBaseEncodedString(),
+          NumLinks: result.node.links.length,
+          BlockSize: blockSize,
+          LinksSize: blockSize - result.node.data.length,
+          DataSize: result.node.data.length,
+          CumulativeSize: blockSize + linkLength
         })
       })
     }),
@@ -282,6 +334,8 @@ module.exports = function object (self) {
         editAndSave((node, cb) => {
           if (DAGLink.isDAGLink(linkRef)) {
             linkRef = linkRef._name
+          } else if (linkRef && linkRef.name) {
+            linkRef = linkRef.name
           }
           DAGNode.rmLink(node, linkRef, cb)
         })(multihash, options, callback)

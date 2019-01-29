@@ -2,6 +2,21 @@
 
 exports = module.exports
 
+exports.gc = (request, reply) => {
+  const ipfs = request.server.app.ipfs
+
+  ipfs.repo.gc((err) => {
+    if (err) {
+      return reply({
+        Message: err.toString(),
+        Code: 0
+      }).code(500)
+    }
+
+    reply()
+  })
+}
+
 exports.version = (request, reply) => {
   const ipfs = request.server.app.ipfs
 
@@ -23,7 +38,7 @@ exports.stat = (request, reply) => {
   const ipfs = request.server.app.ipfs
   const human = request.query.human === 'true'
 
-  ipfs.repo.stat({human: human}, (err, stat) => {
+  ipfs.repo.stat({ human: human }, (err, stat) => {
     if (err) {
       return reply({
         Message: err.toString(),

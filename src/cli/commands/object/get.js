@@ -1,37 +1,49 @@
 'use strict'
 
-const print = require('../../utils').print
+const multibase = require('multibase')
+const { print } = require('../../utils')
+const { cidToString } = require('../../../utils/cid')
 
 module.exports = {
   command: 'get <key>',
 
   describe: 'Get and serialize the DAG node named by <key>',
 
-  builder: {},
+  builder: {
+    'data-encoding': {
+      type: 'string',
+      default: 'base64'
+    },
+    'cid-base': {
+      describe: 'Number base to display CIDs in. Note: specifying a CID base for v0 CIDs will have no effect.',
+      type: 'string',
+      choices: multibase.names
+    }
+  },
 
-  handler (argv) {
-    argv.ipfs.object.get(argv.key, {enc: 'base58'}, (err, node) => {
-      if (err) {
-        throw err
+  handler ({ ipfs, key, dataEncoding, cidBase, resolve }) {
+    resolve((async () => {
+      const node = await ipfs.object.get(key, { enc: 'base58' })
+      let data = node.data
+
+      if (Buffer.isBuffer(data)) {
+        data = node.data.toString(dataEncoding || undefined)
       }
-      const nodeJSON = node.toJSON()
-
-      nodeJSON.data = nodeJSON.data ? nodeJSON.data.toString() : ''
 
       const answer = {
-        Data: nodeJSON.data,
-        Hash: nodeJSON.multihash,
-        Size: nodeJSON.size,
-        Links: nodeJSON.links.map((l) => {
+        Data: data,
+        Hash: cidToString(key, { base: cidBase, upgrade: false }),
+        Size: node.size,
+        Links: node.links.map((l) => {
           return {
             Name: l.name,
             Size: l.size,
-            Hash: l.multihash
+            Hash: cidToString(l.cid, { base: cidBase, upgrade: false })
           }
         })
       }
 
       print(JSON.stringify(answer))
-    })
+    })())
   }
 }

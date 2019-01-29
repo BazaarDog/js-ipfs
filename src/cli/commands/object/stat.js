@@ -9,19 +9,11 @@ module.exports = {
 
   builder: {},
 
-  handler (argv) {
-    argv.ipfs.object.stat(argv.key, {
-      enc: 'base58'
-    }, (err, stats) => {
-      if (err) {
-        throw err
-      }
-
-      delete stats.Hash // only for js-ipfs-api output
-
-      Object.keys(stats).forEach((key) => {
-        print(`${key}: ${stats[key]}`)
-      })
-    })
+  handler ({ ipfs, key, cidBase, resolve }) {
+    resolve((async () => {
+      const stats = await ipfs.object.stat(key, { enc: 'base58' })
+      delete stats.Hash // only for js-ipfs-http-client output
+      Object.keys(stats).forEach((key) => print(`${key}: ${stats[key]}`))
+    })())
   }
 }

@@ -2,15 +2,14 @@
 
 const fs = require('fs')
 const os = require('os')
-const APIctl = require('ipfs-api')
 const multiaddr = require('multiaddr')
-const IPFS = require('../core')
 const path = require('path')
 const debug = require('debug')
 const log = debug('cli')
 log.error = debug('cli:error')
 const Progress = require('progress')
 const byteman = require('byteman')
+const promisify = require('promisify-es6')
 
 exports = module.exports
 
@@ -35,15 +34,20 @@ function getAPICtl (apiAddr) {
     const apiPath = path.join(exports.getRepoPath(), 'api')
     apiAddr = multiaddr(fs.readFileSync(apiPath).toString()).toString()
   }
+  // Required inline to reduce startup time
+  const APIctl = require('ipfs-http-client')
   return APIctl(apiAddr)
 }
 
 exports.getIPFS = (argv, callback) => {
   if (argv.api || isDaemonOn()) {
-    return callback(null, getAPICtl(argv.api), (cb) => cb())
+    return callback(null, getAPICtl(argv.api), promisify((cb) => cb()))
   }
 
+  // Required inline to reduce startup time
+  const IPFS = require('../core')
   const node = new IPFS({
+    silent: argv.silent,
     repo: exports.getRepoPath(),
     init: false,
     start: false,
@@ -53,13 +57,13 @@ exports.getIPFS = (argv, callback) => {
     }
   })
 
-  const cleanup = (cb) => {
+  const cleanup = promisify((cb) => {
     if (node && node._repo && !node._repo.closed) {
-      node._repo.close(() => cb())
+      node._repo.close((err) => cb(err))
     } else {
       cb()
     }
-  }
+  })
 
   node.on('error', (err) => {
     throw err

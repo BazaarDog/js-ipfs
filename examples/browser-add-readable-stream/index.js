@@ -3,7 +3,7 @@
 /* global Ipfs */
 /* eslint-env browser */
 
-const repoPath = 'ipfs-' + Math.random()
+const repoPath = `ipfs-${Math.random()}`
 const ipfs = new Ipfs({ repo: repoPath })
 
 ipfs.on('ready', () => {
@@ -53,7 +53,7 @@ const createFiles = (directory) => {
 
 const streamFiles = (directory, files, cb) => {
   // Create a stream to write files to
-  const stream = ipfs.files.addReadableStream()
+  const stream = ipfs.addReadableStream()
   stream.on('data', function (data) {
     log(`Added ${data.path} hash: ${data.hash}`)
 

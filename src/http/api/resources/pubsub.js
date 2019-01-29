@@ -18,7 +18,7 @@ exports.subscribe = {
 
     const ipfs = request.server.app.ipfs
 
-    const res = new PassThrough({highWaterMark: 1})
+    const res = new PassThrough({ highWaterMark: 1 })
 
     const handler = (msg) => {
       res.write(JSON.stringify({
@@ -29,20 +29,17 @@ exports.subscribe = {
       }) + '\n', 'utf8')
     }
 
-    // js-ipfs-api needs a reply, and go-ipfs does the same thing
+    // js-ipfs-http-client needs a reply, and go-ipfs does the same thing
     res.write('{}\n')
 
     const unsubscribe = () => {
-      ipfs.pubsub.unsubscribe(topic, handler)
-      res.end()
+      ipfs.pubsub.unsubscribe(topic, handler, () => res.end())
     }
 
     request.once('disconnect', unsubscribe)
     request.once('finish', unsubscribe)
 
-    ipfs.pubsub.subscribe(topic, {
-      discover: discover
-    }, handler, (err) => {
+    ipfs.pubsub.subscribe(topic, handler, { discover: discover }, (err) => {
       if (err) {
         return reply(err)
       }
@@ -92,7 +89,7 @@ exports.ls = {
         return reply(new Error(`Failed to list subscriptions: ${err}`))
       }
 
-      reply({Strings: subscriptions})
+      reply({ Strings: subscriptions })
     })
   }
 }
@@ -111,7 +108,7 @@ exports.peers = {
         return reply(new Error(message))
       }
 
-      reply({Strings: peers})
+      reply({ Strings: peers })
     })
   }
 }

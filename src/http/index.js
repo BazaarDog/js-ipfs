@@ -9,6 +9,10 @@ const once = require('once')
 
 const IPFS = require('../core')
 const WStar = require('libp2p-webrtc-star')
+const TCP = require('libp2p-tcp')
+const MulticastDNS = require('libp2p-mdns')
+const WS = require('libp2p-websockets')
+const Bootstrap = require('libp2p-bootstrap')
 const errorHandler = require('./error-handler')
 
 function uriToMultiaddr (uri) {
@@ -17,6 +21,7 @@ function uriToMultiaddr (uri) {
 }
 
 function HttpApi (repo, config, cliArgs) {
+  cliArgs = cliArgs || {}
   this.node = undefined
   this.server = undefined
 
@@ -48,29 +53,41 @@ function HttpApi (repo, config, cliArgs) {
         // Attempt to use any of the WebRTC versions available globally
         let electronWebRTC
         let wrtc
-        try { electronWebRTC = require('electron-webrtc')() } catch (err) {}
-        try { wrtc = require('wrtc') } catch (err) {}
+        try {
+          electronWebRTC = require('electron-webrtc')()
+        } catch (err) {
+          this.log('failed to load optional electron-webrtc dependency')
+        }
+        try {
+          wrtc = require('wrtc')
+        } catch (err) {
+          this.log('failed to load optional webrtc dependency')
+        }
 
         if (wrtc || electronWebRTC) {
           const using = wrtc ? 'wrtc' : 'electron-webrtc'
-          console.log(`Using ${using} for webrtc support`)
+          this.log(`Using ${using} for webrtc support`)
           const wstar = new WStar({ wrtc: (wrtc || electronWebRTC) })
-          libp2p.modules.transport = [wstar]
-          libp2p.modules.discovery = [wstar.discovery]
+          libp2p.modules.transport = [TCP, WS, wstar]
+          libp2p.modules.peerDiscovery = [MulticastDNS, Bootstrap, wstar.discovery]
         }
 
         // try-catch so that programmer errors are not swallowed during testing
         try {
           // start the daemon
           this.node = new IPFS({
+            silent: cliArgs.silent,
             repo: repo,
             init: init,
             start: true,
             config: config,
-            pass: cliArgs && cliArgs.pass,
+            local: cliArgs.local,
+            pass: cliArgs.pass,
             EXPERIMENTAL: {
-              pubsub: cliArgs && cliArgs.enablePubsubExperiment,
-              sharding: cliArgs && cliArgs.enableShardingExperiment
+              pubsub: cliArgs.enablePubsubExperiment,
+              ipnsPubsub: cliArgs.enableNamesysPubsub,
+              dht: cliArgs.enableDhtExperiment,
+              sharding: cliArgs.enableShardingExperiment
             },
             libp2p: libp2p
           })
@@ -99,7 +116,11 @@ function HttpApi (repo, config, cliArgs) {
               routes: {
                 cors: true
               }
-            }
+            },
+            debug: process.env.DEBUG ? {
+              request: ['*'],
+              log: ['*']
+            } : undefined
           })
 
           this.server.app.ipfs = this.node
@@ -145,8 +166,9 @@ function HttpApi (repo, config, cliArgs) {
         api.info.ma = uriToMultiaddr(api.info.uri)
         gateway.info.ma = uriToMultiaddr(gateway.info.uri)
 
-        console.log('API is listening on: %s', api.info.ma)
-        console.log('Gateway (readonly) is listening on: %s', gateway.info.ma)
+        this.node._print('API listening on %s', api.info.ma)
+        this.node._print('Gateway (read only) listening on %s', gateway.info.ma)
+        this.node._print('Web UI available at %s', api.info.uri + '/webui')
 
         // for the CLI to know the where abouts of the API
         this.node._repo.apiAddr.set(api.info.ma, cb)
@@ -165,7 +187,7 @@ function HttpApi (repo, config, cliArgs) {
     ], (err) => {
       if (err) {
         this.log.error(err)
-        console.log('There were errors stopping')
+        console.error('There were errors stopping')
       }
       callback()
     })

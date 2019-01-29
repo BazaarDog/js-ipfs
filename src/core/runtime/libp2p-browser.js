@@ -2,41 +2,63 @@
 
 const WS = require('libp2p-websockets')
 const WebRTCStar = require('libp2p-webrtc-star')
-const WebSocketStar = require('libp2p-websocket-star')
+const WebSocketStarMulti = require('libp2p-websocket-star-multi')
 const Multiplex = require('libp2p-mplex')
 const SECIO = require('libp2p-secio')
-const Railing = require('libp2p-railing')
+const Bootstrap = require('libp2p-bootstrap')
 const libp2p = require('libp2p')
+const defaultsDeep = require('@nodeutils/defaults-deep')
+const multiaddr = require('multiaddr')
 
 class Node extends libp2p {
-  constructor (peerInfo, peerBook, options) {
-    options = options || {}
-    const wrtcstar = new WebRTCStar({id: peerInfo.id})
-    const wsstar = new WebSocketStar({id: peerInfo.id})
+  constructor (_options) {
+    const wrtcstar = new WebRTCStar({ id: _options.peerInfo.id })
 
-    const modules = {
-      transport: [new WS(), wrtcstar, wsstar],
-      connection: {
-        muxer: [Multiplex],
-        crypto: [SECIO]
+    // this can be replaced once optional listening is supported with the below code. ref: https://github.com/libp2p/interface-transport/issues/41
+    // const wsstar = new WebSocketStar({ id: _options.peerInfo.id })
+    const wsstarServers = _options.peerInfo.multiaddrs.toArray().map(String).filter(addr => addr.includes('p2p-websocket-star'))
+    _options.peerInfo.multiaddrs.replace(wsstarServers.map(multiaddr), '/p2p-websocket-star') // the ws-star-multi module will replace this with the chosen ws-star servers
+    const wsstar = new WebSocketStarMulti({ servers: wsstarServers, id: _options.peerInfo.id, ignore_no_online: !wsstarServers.length || _options.wsStarIgnoreErrors })
+
+    const defaults = {
+      modules: {
+        transport: [
+          WS,
+          wrtcstar,
+          wsstar
+        ],
+        streamMuxer: [
+          Multiplex
+        ],
+        connEncryption: [
+          SECIO
+        ],
+        peerDiscovery: [
+          wrtcstar.discovery,
+          wsstar.discovery,
+          Bootstrap
+        ]
       },
-      discovery: [wrtcstar.discovery, wsstar.discovery]
+      config: {
+        peerDiscovery: {
+          bootstrap: {
+            enabled: true
+          },
+          webRTCStar: {
+            enabled: true
+          },
+          websocketStar: {
+            enabled: true
+          }
+        },
+        EXPERIMENTAL: {
+          dht: false,
+          pubsub: false
+        }
+      }
     }
 
-    if (options.bootstrap) {
-      const r = new Railing(options.bootstrap)
-      modules.discovery.push(r)
-    }
-
-    if (options.modules && options.modules.transport) {
-      options.modules.transport.forEach((t) => modules.transport.push(t))
-    }
-
-    if (options.modules && options.modules.discovery) {
-      options.modules.discovery.forEach((d) => modules.discovery.push(d))
-    }
-
-    super(modules, peerInfo, peerBook, options)
+    super(defaultsDeep(_options, defaults))
   }
 }
 

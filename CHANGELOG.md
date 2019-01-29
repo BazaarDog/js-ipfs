@@ -1,3 +1,625 @@
+<a name="0.34.4"></a>
+## [0.34.4](https://github.com/ipfs/js-ipfs/compare/v0.34.3...v0.34.4) (2019-01-24)
+
+
+### Features
+
+* support _dnslink subdomain specified dnslinks ([#1843](https://github.com/ipfs/js-ipfs/issues/1843)) ([a17253e](https://github.com/ipfs/js-ipfs/commit/a17253e))
+
+
+
+<a name="0.34.3"></a>
+## [0.34.3](https://github.com/ipfs/js-ipfs/compare/v0.34.2...v0.34.3) (2019-01-24)
+
+
+### Bug Fixes
+
+* add cors support for preload-mock-server and update aegir ([#1839](https://github.com/ipfs/js-ipfs/issues/1839)) ([2d45c9d](https://github.com/ipfs/js-ipfs/commit/2d45c9d))
+
+
+
+<a name="0.34.2"></a>
+## [0.34.2](https://github.com/ipfs/js-ipfs/compare/v0.34.1...v0.34.2) (2019-01-21)
+
+
+### Bug Fixes
+
+* race condition causing Database is not open error ([#1834](https://github.com/ipfs/js-ipfs/issues/1834)) ([6066c97](https://github.com/ipfs/js-ipfs/commit/6066c97))
+
+
+### Features
+
+* use ws-star-multi instead of ws-star ([#1793](https://github.com/ipfs/js-ipfs/issues/1793)) ([21fd4d1](https://github.com/ipfs/js-ipfs/commit/21fd4d1))
+
+
+
+<a name="0.34.1"></a>
+## [0.34.1](https://github.com/ipfs/js-ipfs/compare/v0.34.0...v0.34.1) (2019-01-21)
+
+
+### Features
+
+* pipe to add ([#1833](https://github.com/ipfs/js-ipfs/issues/1833)) ([ea53071](https://github.com/ipfs/js-ipfs/commit/ea53071))
+
+
+
+<a name="0.34.0"></a>
+# [0.34.0](https://github.com/ipfs/js-ipfs/compare/v0.34.0-rc.1...v0.34.0) (2019-01-17)
+
+
+
+<a name="0.34.0-rc.1"></a>
+# [0.34.0-rc.1](https://github.com/ipfs/js-ipfs/compare/v0.34.0-rc.0...v0.34.0-rc.1) (2019-01-15)
+
+
+### Bug Fixes
+
+* sharness tests ([#1787](https://github.com/ipfs/js-ipfs/issues/1787)) ([48d3e2b](https://github.com/ipfs/js-ipfs/commit/48d3e2b))
+
+
+### Code Refactoring
+
+* switch to bignumber.js ([#1803](https://github.com/ipfs/js-ipfs/issues/1803)) ([6de6adf](https://github.com/ipfs/js-ipfs/commit/6de6adf))
+
+
+### Features
+
+* update to Web UI v2.3.2 ([#1807](https://github.com/ipfs/js-ipfs/issues/1807)) ([8ca6471](https://github.com/ipfs/js-ipfs/commit/8ca6471))
+* update Web UI to v2.3.0 ([#1786](https://github.com/ipfs/js-ipfs/issues/1786)) ([7bcc496](https://github.com/ipfs/js-ipfs/commit/7bcc496))
+
+
+### BREAKING CHANGES
+
+* All API methods that returned [`big.js`](https://github.com/MikeMcl/big.js/) instances now return [`bignumber.js`](https://github.com/MikeMcl/bignumber.js/) instances.
+
+License: MIT
+Signed-off-by: Alan Shaw <alan.shaw@protocol.ai>
+
+
+
+<a name="0.34.0-rc.0"></a>
+# [0.34.0-rc.0](https://github.com/ipfs/js-ipfs/compare/v0.34.0-pre.0...v0.34.0-rc.0) (2018-12-18)
+
+
+### Bug Fixes
+
+* link to Github profile for David Dias ([3659d7e](https://github.com/ipfs/js-ipfs/commit/3659d7e))
+* streaming cat over http api ([#1760](https://github.com/ipfs/js-ipfs/issues/1760)) ([3ded576](https://github.com/ipfs/js-ipfs/commit/3ded576))
+
+
+### Features
+
+* add `addFromFs` method ([#1777](https://github.com/ipfs/js-ipfs/issues/1777)) ([7315aa1](https://github.com/ipfs/js-ipfs/commit/7315aa1))
+* add from url/stream ([#1773](https://github.com/ipfs/js-ipfs/issues/1773)) ([b6a7ab6](https://github.com/ipfs/js-ipfs/commit/b6a7ab6))
+* add slient option ([#1712](https://github.com/ipfs/js-ipfs/issues/1712)) ([593334b](https://github.com/ipfs/js-ipfs/commit/593334b))
+* cid base option ([#1552](https://github.com/ipfs/js-ipfs/issues/1552)) ([6d46e2e](https://github.com/ipfs/js-ipfs/commit/6d46e2e)), closes [/github.com/ipfs/go-ipfs/issues/5349#issuecomment-445104823](https://github.com//github.com/ipfs/go-ipfs/issues/5349/issues/issuecomment-445104823)
+
+
+
+<a name="0.34.0-pre.0"></a>
+# [0.34.0-pre.0](https://github.com/ipfs/js-ipfs/compare/v0.33.1...v0.34.0-pre.0) (2018-12-07)
+
+
+### Bug Fixes
+
+* add dash case to pin cli ([#1719](https://github.com/ipfs/js-ipfs/issues/1719)) ([eacd580](https://github.com/ipfs/js-ipfs/commit/eacd580))
+* add missing dependencies ([#1663](https://github.com/ipfs/js-ipfs/issues/1663)) ([4bcf4a7](https://github.com/ipfs/js-ipfs/commit/4bcf4a7))
+* allow disabling mfs preload from config ([#1733](https://github.com/ipfs/js-ipfs/issues/1733)) ([5f66538](https://github.com/ipfs/js-ipfs/commit/5f66538))
+* better error message when pubsub is not enabled ([#1729](https://github.com/ipfs/js-ipfs/issues/1729)) ([5237dd9](https://github.com/ipfs/js-ipfs/commit/5237dd9))
+* examples after files API refactor ([#1740](https://github.com/ipfs/js-ipfs/issues/1740)) ([34ec036](https://github.com/ipfs/js-ipfs/commit/34ec036))
+* ipns datastore key ([#1741](https://github.com/ipfs/js-ipfs/issues/1741)) ([a39770e](https://github.com/ipfs/js-ipfs/commit/a39770e))
+* make circuit relay test ([#1710](https://github.com/ipfs/js-ipfs/issues/1710)) ([345ce91](https://github.com/ipfs/js-ipfs/commit/345ce91))
+* remove electron-webrtc and wrtc for now ([#1718](https://github.com/ipfs/js-ipfs/issues/1718)) ([b6b50d5](https://github.com/ipfs/js-ipfs/commit/b6b50d5))
+
+
+### Code Refactoring
+
+* files API ([#1720](https://github.com/ipfs/js-ipfs/issues/1720)) ([a82a5dc](https://github.com/ipfs/js-ipfs/commit/a82a5dc))
+* object APIs write methods now return CIDs ([#1730](https://github.com/ipfs/js-ipfs/issues/1730)) ([ac5fa8e](https://github.com/ipfs/js-ipfs/commit/ac5fa8e)), closes [/github.com/ipfs/interface-ipfs-core/pull/388#pullrequestreview-173866270](https://github.com//github.com/ipfs/interface-ipfs-core/pull/388/issues/pullrequestreview-173866270)
+
+
+### Features
+
+* ipns over dht ([#1725](https://github.com/ipfs/js-ipfs/issues/1725)) ([1a943f8](https://github.com/ipfs/js-ipfs/commit/1a943f8))
+* ipns over pubsub ([#1559](https://github.com/ipfs/js-ipfs/issues/1559)) ([8712542](https://github.com/ipfs/js-ipfs/commit/8712542))
+* Web UI updated to v2.2.0 ([#1711](https://github.com/ipfs/js-ipfs/issues/1711)) ([b2158bc](https://github.com/ipfs/js-ipfs/commit/b2158bc))
+
+
+### Performance Improvements
+
+* lazy load IPLD formats ([#1704](https://github.com/ipfs/js-ipfs/issues/1704)) ([aefb261](https://github.com/ipfs/js-ipfs/commit/aefb261))
+
+
+### BREAKING CHANGES
+
+* Object API refactor.
+
+Object API methods that write DAG nodes now return a [CID](https://www.npmjs.com/package/cids) instead of a DAG node. Affected methods:
+
+* `ipfs.object.new`
+* `ipfs.object.patch.addLink`
+* `ipfs.object.patch.appendData`
+* `ipfs.object.patch.rmLink`
+* `ipfs.object.patch.setData`
+* `ipfs.object.put`
+
+Example:
+
+```js
+// Before
+const dagNode = await ipfs.object.new()
+```
+
+```js
+// After
+const cid = await ipfs.object.new() // now returns a CID
+const dagNode = await ipfs.object.get(cid) // fetch the DAG node that was created
+```
+
+IMPORTANT: `DAGNode` instances, which are part of the IPLD dag-pb format have been refactored.
+
+These instances no longer have `multihash`, `cid` or `serialized` properties.
+
+This effects the following API methods that return these types of objects:
+
+* `ipfs.object.get`
+* `ipfs.dag.get`
+
+See https://github.com/ipld/js-ipld-dag-pb/pull/99 for more information.
+
+License: MIT
+Signed-off-by: Alan Shaw <alan.shaw@protocol.ai>
+* Files API methods `add*`, `cat*`, `get*` have moved from `files` to the root namespace.
+
+Specifically, the following changes have been made:
+
+* `ipfs.files.add` => `ipfs.add`
+* `ipfs.files.addPullStream` => `ipfs.addPullStream`
+* `ipfs.files.addReadableStream` => `ipfs.addReadableStream`
+* `ipfs.files.cat` => `ipfs.cat`
+* `ipfs.files.catPullStream` => `ipfs.catPullStream`
+* `ipfs.files.catReadableStream` => `ipfs.catReadableStream`
+* `ipfs.files.get` => `ipfs.get`
+* `ipfs.files.getPullStream` => `ipfs.getPullStream`
+* `ipfs.files.getReadableStream` => `ipfs.getReadableStream`
+
+License: MIT
+Signed-off-by: Alan Shaw <alan.shaw@protocol.ai>
+
+
+
+<a name="0.33.1"></a>
+## [0.33.1](https://github.com/ipfs/js-ipfs/compare/v0.33.0...v0.33.1) (2018-11-05)
+
+
+### Bug Fixes
+
+* over eager preload ([#1693](https://github.com/ipfs/js-ipfs/issues/1693)) ([f14c20d](https://github.com/ipfs/js-ipfs/commit/f14c20d))
+
+
+
+<a name="0.33.0"></a>
+# [0.33.0](https://github.com/ipfs/js-ipfs/compare/v0.33.0-rc.4...v0.33.0) (2018-11-01)
+
+
+
+<a name="0.33.0-rc.4"></a>
+# [0.33.0-rc.4](https://github.com/ipfs/js-ipfs/compare/v0.33.0-rc.3...v0.33.0-rc.4) (2018-11-01)
+
+
+### Bug Fixes
+
+* remove accidentally committed code ([66fa8ef](https://github.com/ipfs/js-ipfs/commit/66fa8ef))
+* remove local option from global commands ([#1648](https://github.com/ipfs/js-ipfs/issues/1648)) ([8e963f9](https://github.com/ipfs/js-ipfs/commit/8e963f9))
+* remove npm script ([df32ac4](https://github.com/ipfs/js-ipfs/commit/df32ac4))
+* remove unused deps ([f7189fb](https://github.com/ipfs/js-ipfs/commit/f7189fb))
+* use class is function on ipns ([#1617](https://github.com/ipfs/js-ipfs/issues/1617)) ([c240d49](https://github.com/ipfs/js-ipfs/commit/c240d49)), closes [js-peer-id#84](https://github.com/js-peer-id/issues/84) [interface-datastore#24](https://github.com/interface-datastore/issues/24) [#1615](https://github.com/ipfs/js-ipfs/issues/1615)
+
+
+### Chores
+
+* remove ipld formats re-export ([#1626](https://github.com/ipfs/js-ipfs/issues/1626)) ([3ee7b5e](https://github.com/ipfs/js-ipfs/commit/3ee7b5e))
+* update to js-ipld 0.19 ([#1668](https://github.com/ipfs/js-ipfs/issues/1668)) ([74edafd](https://github.com/ipfs/js-ipfs/commit/74edafd))
+
+
+### Features
+
+* add support to pass config in the init cmd ([#1662](https://github.com/ipfs/js-ipfs/issues/1662)) ([588891c](https://github.com/ipfs/js-ipfs/commit/588891c))
+* get Ping to work properly ([27d5a57](https://github.com/ipfs/js-ipfs/commit/27d5a57))
+
+
+### BREAKING CHANGES
+
+* dag-cbor nodes now represent links as CID objects
+
+The API for [dag-cbor](https://github.com/ipld/js-ipld-dag-cbor) changed.
+Links are no longer represented as JSON objects (`{"/": "base-encoded-cid"}`,
+but as [CID objects](https://github.com/ipld/js-cid). `ipfs.dag.get()` and now always return links as CID objects. `ipfs.dag.put()` also expects links to be represented as CID objects. The old-style JSON objects representation is still
+supported, but deprecated.
+
+Prior to this change:
+
+```js
+const cid = new CID('QmXed8RihWcWFXRRmfSRG9yFjEbXNxu1bDwgCFAN8Dxcq5')
+// Link as JSON object representation
+const putCid = await ipfs.dag.put({link: {'/': cid.toBaseEncodedString()}})
+const result = await ipfs.dag.get(putCid)
+console.log(result.value)
+
+```
+
+Output:
+
+```js
+{ link:
+   { '/':
+      <Buffer 12 20 8a…> } }
+```
+
+Now:
+
+```js
+const cid = new CID('QmXed8RihWcWFXRRmfSRG9yFjEbXNxu1bDwgCFAN8Dxcq5')
+// Link as CID object
+const putCid = await ipfs.dag.put({link: cid})
+const result = await ipfs.dag.get(putCid)
+console.log(result.value)
+```
+
+Output:
+
+```js
+{ link:
+   CID {
+     codec: 'dag-pb',
+     version: 0,
+     multihash:
+      <Buffer 12 20 8a…> } }
+```
+
+See https://github.com/ipld/ipld/issues/44 for more information on why this
+change was made.
+* remove `types.dagCBOR` and `types.dagPB` from public API
+
+If you need the `ipld-dag-cbor` or `ipld-dag-pb` module in the Browser,
+you need to bundle them yourself.
+
+
+
+<a name="0.33.0-rc.3"></a>
+# [0.33.0-rc.3](https://github.com/ipfs/js-ipfs/compare/v0.33.0-rc.2...v0.33.0-rc.3) (2018-10-24)
+
+
+
+<a name="0.33.0-rc.2"></a>
+# [0.33.0-rc.2](https://github.com/ipfs/js-ipfs/compare/v0.33.0-rc.1...v0.33.0-rc.2) (2018-10-23)
+
+
+
+<a name="0.33.0-rc.1"></a>
+# [0.33.0-rc.1](https://github.com/ipfs/js-ipfs/compare/v0.32.3...v0.33.0-rc.1) (2018-10-19)
+
+
+### Bug Fixes
+
+* make ipfs.ping() options optional ([#1627](https://github.com/ipfs/js-ipfs/issues/1627)) ([08f06b6](https://github.com/ipfs/js-ipfs/commit/08f06b6)), closes [#1616](https://github.com/ipfs/js-ipfs/issues/1616)
+
+
+### Features
+
+* **gateway:** X-Ipfs-Path, Etag, Cache-Control, Suborigin ([#1537](https://github.com/ipfs/js-ipfs/issues/1537)) ([fc5bef7](https://github.com/ipfs/js-ipfs/commit/fc5bef7))
+* add cid command ([#1560](https://github.com/ipfs/js-ipfs/issues/1560)) ([a22c791](https://github.com/ipfs/js-ipfs/commit/a22c791))
+* show Web UI url in daemon output ([#1595](https://github.com/ipfs/js-ipfs/issues/1595)) ([9a82b05](https://github.com/ipfs/js-ipfs/commit/9a82b05))
+* update to Web UI 2.0 ([#1647](https://github.com/ipfs/js-ipfs/issues/1647)) ([aea85aa](https://github.com/ipfs/js-ipfs/commit/aea85aa))
+
+
+
+<a name="0.32.3"></a>
+## [0.32.3](https://github.com/ipfs/js-ipfs/compare/v0.32.2...v0.32.3) (2018-09-28)
+
+
+### Bug Fixes
+
+* allow null/undefined options ([#1581](https://github.com/ipfs/js-ipfs/issues/1581)) ([c73bd2f](https://github.com/ipfs/js-ipfs/commit/c73bd2f)), closes [#1574](https://github.com/ipfs/js-ipfs/issues/1574)
+* block.put with non default options ([#1600](https://github.com/ipfs/js-ipfs/issues/1600)) ([4ba0a24](https://github.com/ipfs/js-ipfs/commit/4ba0a24))
+* ipns datastore get not found ([#1558](https://github.com/ipfs/js-ipfs/issues/1558)) ([4e99cf5](https://github.com/ipfs/js-ipfs/commit/4e99cf5))
+* report correct size for raw dag nodes ([#1591](https://github.com/ipfs/js-ipfs/issues/1591)) ([549f2f6](https://github.com/ipfs/js-ipfs/commit/549f2f6)), closes [#1585](https://github.com/ipfs/js-ipfs/issues/1585)
+* revert libp2p records being signed for ipns ([#1570](https://github.com/ipfs/js-ipfs/issues/1570)) ([855b3bd](https://github.com/ipfs/js-ipfs/commit/855b3bd))
+
+
+
+<a name="0.32.2"></a>
+## [0.32.2](https://github.com/ipfs/js-ipfs/compare/v0.32.1...v0.32.2) (2018-09-19)
+
+
+### Bug Fixes
+
+* coerce key gen size to number ([#1582](https://github.com/ipfs/js-ipfs/issues/1582)) ([25d820d](https://github.com/ipfs/js-ipfs/commit/25d820d))
+
+
+
+<a name="0.32.1"></a>
+## [0.32.1](https://github.com/ipfs/js-ipfs/compare/v0.32.0...v0.32.1) (2018-09-18)
+
+
+### Bug Fixes
+
+* add libp2p-crypto to deps list ([#1572](https://github.com/ipfs/js-ipfs/issues/1572)) ([7eaf571](https://github.com/ipfs/js-ipfs/commit/7eaf571)), closes [#1571](https://github.com/ipfs/js-ipfs/issues/1571)
+* enable tests in node that were not being included ([#1499](https://github.com/ipfs/js-ipfs/issues/1499)) ([2585431](https://github.com/ipfs/js-ipfs/commit/2585431))
+* fix `block rm` command ([#1576](https://github.com/ipfs/js-ipfs/issues/1576)) ([af30ea5](https://github.com/ipfs/js-ipfs/commit/af30ea5))
+* mfs preload test ([#1551](https://github.com/ipfs/js-ipfs/issues/1551)) ([7c7a5a6](https://github.com/ipfs/js-ipfs/commit/7c7a5a6))
+
+
+### Performance Improvements
+
+* faster startup time ([#1542](https://github.com/ipfs/js-ipfs/issues/1542)) ([2790e6d](https://github.com/ipfs/js-ipfs/commit/2790e6d))
+
+
+
+<a name="0.32.0"></a>
+# [0.32.0](https://github.com/ipfs/js-ipfs/compare/v0.32.0-rc.2...v0.32.0) (2018-09-11)
+
+
+### Bug Fixes
+
+* ipns publish resolve option overwritten ([#1556](https://github.com/ipfs/js-ipfs/issues/1556)) ([ef7d2c8](https://github.com/ipfs/js-ipfs/commit/ef7d2c8))
+
+
+### Features
+
+* Added `ipfs.name.publish` and `ipfs.name.resolve`. This only works on your local node for the moment until the DHT lands. [API docs can be found here](https://github.com/ipfs/interface-ipfs-core/blob/master/SPEC/NAME.md).
+* Added `ipfs.resolve` API. Note that this is a partial implementation allowing you to resolve IPFS paths like `/ipfs/QmRootHash/path/to/file` to `/ipfs/QmFileHash`. It does not support IPNS yet.
+* `ipfs.files.add*` now supports a `chunker` option, see [the API docs](https://github.com/ipfs/interface-ipfs-core/blob/master/SPEC/FILES.md#filesadd) for details
+
+
+<a name="0.31.7"></a>
+## [0.31.7](https://github.com/ipfs/js-ipfs/compare/v0.31.6...v0.31.7) (2018-08-20)
+
+
+### Bug Fixes
+
+* fails to start when preload disabled ([#1516](https://github.com/ipfs/js-ipfs/issues/1516)) ([511ab47](https://github.com/ipfs/js-ipfs/commit/511ab47)), closes [#1514](https://github.com/ipfs/js-ipfs/issues/1514)
+* npm publishes examples folder ([#1513](https://github.com/ipfs/js-ipfs/issues/1513)) ([4a68ac1](https://github.com/ipfs/js-ipfs/commit/4a68ac1))
+
+
+
+<a name="0.31.6"></a>
+## [0.31.6](https://github.com/ipfs/js-ipfs/compare/v0.31.5...v0.31.6) (2018-08-17)
+
+
+### Features
+
+* adds data-encoding argument to control data encoding ([#1420](https://github.com/ipfs/js-ipfs/issues/1420)) ([1eb8485](https://github.com/ipfs/js-ipfs/commit/1eb8485))
+
+
+
+<a name="0.31.5"></a>
+## [0.31.5](https://github.com/ipfs/js-ipfs/compare/v0.31.4...v0.31.5) (2018-08-17)
+
+
+### Bug Fixes
+
+* add missing space after emoji ([5cde7c1](https://github.com/ipfs/js-ipfs/commit/5cde7c1))
+* improper input validation ([#1506](https://github.com/ipfs/js-ipfs/issues/1506)) ([91a482b](https://github.com/ipfs/js-ipfs/commit/91a482b))
+* object.patch.rmLink not working ([#1508](https://github.com/ipfs/js-ipfs/issues/1508)) ([afd3255](https://github.com/ipfs/js-ipfs/commit/afd3255))
+* stub out call to fetch for ipfs.dns test in browser ([#1512](https://github.com/ipfs/js-ipfs/issues/1512)) ([86c3d81](https://github.com/ipfs/js-ipfs/commit/86c3d81))
+
+
+
+<a name="0.31.4"></a>
+## [0.31.4](https://github.com/ipfs/js-ipfs/compare/v0.31.3...v0.31.4) (2018-08-09)
+
+
+### Bug Fixes
+
+* consistent badge style in docs ([#1494](https://github.com/ipfs/js-ipfs/issues/1494)) ([4a72e23](https://github.com/ipfs/js-ipfs/commit/4a72e23))
+* files.ls and files.read*Stream tests ([#1493](https://github.com/ipfs/js-ipfs/issues/1493)) ([a0bc79b](https://github.com/ipfs/js-ipfs/commit/a0bc79b))
+
+
+
+<a name="0.31.3"></a>
+## [0.31.3](https://github.com/ipfs/js-ipfs/compare/v0.31.2...v0.31.3) (2018-08-09)
+
+
+### Bug Fixes
+
+* failing tests in master ([#1488](https://github.com/ipfs/js-ipfs/issues/1488)) ([e607560](https://github.com/ipfs/js-ipfs/commit/e607560))
+* **dag:** check dag.put options for plain object ([#1480](https://github.com/ipfs/js-ipfs/issues/1480)) ([d0b671b](https://github.com/ipfs/js-ipfs/commit/d0b671b)), closes [#1479](https://github.com/ipfs/js-ipfs/issues/1479)
+* **dht:** allow for options object in `findProvs()` API ([#1457](https://github.com/ipfs/js-ipfs/issues/1457)) ([99911b1](https://github.com/ipfs/js-ipfs/commit/99911b1)), closes [#1322](https://github.com/ipfs/js-ipfs/issues/1322)
+
+
+
+<a name="0.31.2"></a>
+## [0.31.2](https://github.com/ipfs/js-ipfs/compare/v0.31.1...v0.31.2) (2018-08-02)
+
+
+### Bug Fixes
+
+* fix content-type by doing a fall-back using extensions ([#1482](https://github.com/ipfs/js-ipfs/issues/1482)) ([d528b3f](https://github.com/ipfs/js-ipfs/commit/d528b3f))
+
+
+
+<a name="0.31.1"></a>
+## [0.31.1](https://github.com/ipfs/js-ipfs/compare/v0.31.0...v0.31.1) (2018-07-29)
+
+
+### Bug Fixes
+
+* logo link ([a9219ad](https://github.com/ipfs/js-ipfs/commit/a9219ad))
+* XMLHTTPRequest is deprecated and unavailable in service workers ([#1478](https://github.com/ipfs/js-ipfs/issues/1478)) ([7d6f0ca](https://github.com/ipfs/js-ipfs/commit/7d6f0ca))
+
+
+
+<a name="0.31.0"></a>
+# [0.31.0](https://github.com/ipfs/js-ipfs/compare/v0.30.1...v0.31.0) (2018-07-29)
+
+
+### Bug Fixes
+
+* emit boot error only once ([#1472](https://github.com/ipfs/js-ipfs/issues/1472)) ([45b80a0](https://github.com/ipfs/js-ipfs/commit/45b80a0))
+
+
+### Features
+
+* preload content ([#1464](https://github.com/ipfs/js-ipfs/issues/1464)) ([bffe080](https://github.com/ipfs/js-ipfs/commit/bffe080)), closes [#1459](https://github.com/ipfs/js-ipfs/issues/1459)
+* preload on content fetch requests ([#1475](https://github.com/ipfs/js-ipfs/issues/1475)) ([649b755](https://github.com/ipfs/js-ipfs/commit/649b755)), closes [#1473](https://github.com/ipfs/js-ipfs/issues/1473)
+* remove decomissioned bootstrappers ([e3868f4](https://github.com/ipfs/js-ipfs/commit/e3868f4))
+* rm decomissioned bootstrappers - nodejs ([90e9f68](https://github.com/ipfs/js-ipfs/commit/90e9f68))
+* support --raw-leaves ([#1454](https://github.com/ipfs/js-ipfs/issues/1454)) ([1f63e8c](https://github.com/ipfs/js-ipfs/commit/1f63e8c))
+
+
+### Reverts
+
+* docs: add migration note about upgrading from < 0.30.0 ([#1450](https://github.com/ipfs/js-ipfs/issues/1450)) ([#1456](https://github.com/ipfs/js-ipfs/issues/1456)) ([f4344b0](https://github.com/ipfs/js-ipfs/commit/f4344b0))
+
+
+
+<a name="0.30.1"></a>
+## [0.30.1](https://github.com/ipfs/js-ipfs/compare/v0.30.0...v0.30.1) (2018-07-17)
+
+
+### Bug Fixes
+
+* aegir docs fails if outer funtion is called pin ([#1429](https://github.com/ipfs/js-ipfs/issues/1429)) ([a08a17d](https://github.com/ipfs/js-ipfs/commit/a08a17d))
+* double pre start ([#1437](https://github.com/ipfs/js-ipfs/issues/1437)) ([e6ad63e](https://github.com/ipfs/js-ipfs/commit/e6ad63e))
+* fixing circuit-relaying example ([#1443](https://github.com/ipfs/js-ipfs/issues/1443)) ([a681fc5](https://github.com/ipfs/js-ipfs/commit/a681fc5)), closes [#1423](https://github.com/ipfs/js-ipfs/issues/1423)
+
+
+
+<a name="0.30.0"></a>
+# [0.30.0](https://github.com/ipfs/js-ipfs/compare/v0.29.3...v0.30.0) (2018-07-09)
+
+
+### Bug Fixes
+
+* allow put empty block & add X-Stream-Output header on get ([#1408](https://github.com/ipfs/js-ipfs/issues/1408)) ([52f7aa7](https://github.com/ipfs/js-ipfs/commit/52f7aa7))
+* broken contributing links ([#1386](https://github.com/ipfs/js-ipfs/issues/1386)) ([cd449ff](https://github.com/ipfs/js-ipfs/commit/cd449ff))
+* do not stringify output of object data ([#1398](https://github.com/ipfs/js-ipfs/issues/1398)) ([4e51a69](https://github.com/ipfs/js-ipfs/commit/4e51a69))
+* **dag:** fix default hash algorithm for put() api ([#1419](https://github.com/ipfs/js-ipfs/issues/1419)) ([1a36375](https://github.com/ipfs/js-ipfs/commit/1a36375))
+* **dag:** make options in `put` API optional ([#1415](https://github.com/ipfs/js-ipfs/issues/1415)) ([d299ed7](https://github.com/ipfs/js-ipfs/commit/d299ed7)), closes [#1395](https://github.com/ipfs/js-ipfs/issues/1395)
+* **tests:** loosen assertion for bitswap.stat test ([#1404](https://github.com/ipfs/js-ipfs/issues/1404)) ([4290256](https://github.com/ipfs/js-ipfs/commit/4290256))
+* update hlsjs-ipfs-loader version ([#1422](https://github.com/ipfs/js-ipfs/issues/1422)) ([6b14812](https://github.com/ipfs/js-ipfs/commit/6b14812))
+
+
+### Features
+
+* (BREAKING CHANGE) new libp2p configuration ([#1401](https://github.com/ipfs/js-ipfs/issues/1401)) ([9c60909](https://github.com/ipfs/js-ipfs/commit/9c60909))
+* expose libp2p connection manager configuration options ([#1410](https://github.com/ipfs/js-ipfs/issues/1410)) ([2615f76](https://github.com/ipfs/js-ipfs/commit/2615f76))
+* implement bitswap.wantlist peerid and bitswap.unwant ([#1349](https://github.com/ipfs/js-ipfs/issues/1349)) ([45b705d](https://github.com/ipfs/js-ipfs/commit/45b705d))
+* mfs implementation ([#1360](https://github.com/ipfs/js-ipfs/issues/1360)) ([871d24e](https://github.com/ipfs/js-ipfs/commit/871d24e)), closes [#1425](https://github.com/ipfs/js-ipfs/issues/1425)
+* modular interface tests ([#1389](https://github.com/ipfs/js-ipfs/issues/1389)) ([18888be](https://github.com/ipfs/js-ipfs/commit/18888be))
+* pin API ([#1045](https://github.com/ipfs/js-ipfs/issues/1045)) ([2a5cc5e](https://github.com/ipfs/js-ipfs/commit/2a5cc5e)), closes [#1249](https://github.com/ipfs/js-ipfs/issues/1249)
+
+
+### Performance Improvements
+
+* use lodash ([#1414](https://github.com/ipfs/js-ipfs/issues/1414)) ([5637330](https://github.com/ipfs/js-ipfs/commit/5637330))
+
+
+### BREAKING CHANGES
+
+* libp2p configuration has changed
+
+    * old: `libp2p.modules.discovery`
+    * new: `libp2p.modules.peerDiscovery`
+
+License: MIT
+Signed-off-by: David Dias <mail@daviddias.me>
+
+License: MIT
+Signed-off-by: Alan Shaw <alan@tableflip.io>
+
+
+
+<a name="0.29.3"></a>
+## [0.29.3](https://github.com/ipfs/js-ipfs/compare/v0.29.2...v0.29.3) (2018-06-04)
+
+
+### Bug Fixes
+
+* **repo:** do not hang on calls to repo gc ([9fff46f](https://github.com/ipfs/js-ipfs/commit/9fff46f))
+
+
+
+<a name="0.29.2"></a>
+## [0.29.2](https://github.com/ipfs/js-ipfs/compare/v0.29.1...v0.29.2) (2018-06-01)
+
+
+### Bug Fixes
+
+* adds missing breaking changes for 0.29 to changelog ([#1370](https://github.com/ipfs/js-ipfs/issues/1370)) ([61ba99e](https://github.com/ipfs/js-ipfs/commit/61ba99e))
+* dont fail on uninitialized repo ([#1374](https://github.com/ipfs/js-ipfs/issues/1374)) ([6f0a95b](https://github.com/ipfs/js-ipfs/commit/6f0a95b))
+
+
+
+<a name="0.29.1"></a>
+## [0.29.1](https://github.com/ipfs/js-ipfs/compare/v0.29.0...v0.29.1) (2018-05-30)
+
+
+### Bug Fixes
+
+* check for repo uninitialized error ([dcf5ea5](https://github.com/ipfs/js-ipfs/commit/dcf5ea5))
+* update ipfs-repo errors require ([4d1318d](https://github.com/ipfs/js-ipfs/commit/4d1318d))
+
+
+
+<a name="0.29.0"></a>
+# [0.29.0](https://github.com/ipfs/js-ipfs/compare/v0.28.2...v0.29.0) (2018-05-29)
+
+
+### Bug Fixes
+
+* Add ipfs path to cli help ([64c3bfb](https://github.com/ipfs/js-ipfs/commit/64c3bfb))
+* change ^ to ~ on 0.x.x deps ([#1345](https://github.com/ipfs/js-ipfs/issues/1345)) ([de95989](https://github.com/ipfs/js-ipfs/commit/de95989))
+* change default config from JSON file to JS module to prevent having it doubly used ([#1324](https://github.com/ipfs/js-ipfs/issues/1324)) ([c3d2d1e](https://github.com/ipfs/js-ipfs/commit/c3d2d1e)), closes [#1316](https://github.com/ipfs/js-ipfs/issues/1316)
+* changes peer prop in return value from swarm.peers to be a PeerId  ([#1252](https://github.com/ipfs/js-ipfs/issues/1252)) ([e174866](https://github.com/ipfs/js-ipfs/commit/e174866))
+* configure webpack to not use esmodules in dependencies ([4486acc](https://github.com/ipfs/js-ipfs/commit/4486acc))
+* Display error when using unkown cli option ([a849d2f](https://github.com/ipfs/js-ipfs/commit/a849d2f))
+* docker init script sed in non existent file ([#1246](https://github.com/ipfs/js-ipfs/issues/1246)) ([75d47c3](https://github.com/ipfs/js-ipfs/commit/75d47c3))
+* files.add with pull streams ([0e601a7](https://github.com/ipfs/js-ipfs/commit/0e601a7))
+* make pubsub.unsubscribe async and alter pubsub.subscribe signature ([a115829](https://github.com/ipfs/js-ipfs/commit/a115829))
+* remove unused var ([#1273](https://github.com/ipfs/js-ipfs/issues/1273)) ([c1e8db1](https://github.com/ipfs/js-ipfs/commit/c1e8db1))
+* typo ([#1367](https://github.com/ipfs/js-ipfs/issues/1367)) ([2679129](https://github.com/ipfs/js-ipfs/commit/2679129))
+* use async/setImmediate vs process.nextTick ([af55608](https://github.com/ipfs/js-ipfs/commit/af55608))
+
+
+### Features
+
+* .stats.bw* - Bandwidth Stats ([#1230](https://github.com/ipfs/js-ipfs/issues/1230)) ([9694925](https://github.com/ipfs/js-ipfs/commit/9694925))
+* add ability to files.cat with a cid instance ([2e332c8](https://github.com/ipfs/js-ipfs/commit/2e332c8))
+* Add support for specifying hash algorithms in files.add ([a2954cb](https://github.com/ipfs/js-ipfs/commit/a2954cb))
+* allow dht to be enabled via cli arg ([#1340](https://github.com/ipfs/js-ipfs/issues/1340)) ([7bb838f](https://github.com/ipfs/js-ipfs/commit/7bb838f))
+* Allows for byte offsets when using ipfs.files.cat and friends to request slices of files ([a93971a](https://github.com/ipfs/js-ipfs/commit/a93971a))
+* Circuit Relay ([#1063](https://github.com/ipfs/js-ipfs/issues/1063)) ([f7eaa43](https://github.com/ipfs/js-ipfs/commit/f7eaa43))
+* cli: add IPFS_PATH info to init command help ([#1274](https://github.com/ipfs/js-ipfs/issues/1274)) ([e189b72](https://github.com/ipfs/js-ipfs/commit/e189b72))
+* handle SIGHUP ([7a817cf](https://github.com/ipfs/js-ipfs/commit/7a817cf))
+* ipfs.ping cli, http-api and core ([#1342](https://github.com/ipfs/js-ipfs/issues/1342)) ([b8171b1](https://github.com/ipfs/js-ipfs/commit/b8171b1))
+* jsipfs add --only-hash ([#1233](https://github.com/ipfs/js-ipfs/issues/1233)) ([#1266](https://github.com/ipfs/js-ipfs/issues/1266)) ([bddc5b4](https://github.com/ipfs/js-ipfs/commit/bddc5b4))
+* Provide access to bundled libraries when in browser ([#1297](https://github.com/ipfs/js-ipfs/issues/1297)) ([4905c2d](https://github.com/ipfs/js-ipfs/commit/4905c2d))
+* use class-is for type checks ([5b2cf8c](https://github.com/ipfs/js-ipfs/commit/5b2cf8c))
+* wrap with directory ([#1329](https://github.com/ipfs/js-ipfs/issues/1329)) ([47285a7](https://github.com/ipfs/js-ipfs/commit/47285a7))
+
+
+### Performance Improvements
+
+* **cli:** load only sub-system modules and inline require ipfs ([3820be0](https://github.com/ipfs/js-ipfs/commit/3820be0))
+
+
+### BREAKING CHANGES
+
+1. Argument order for `pubsub.subscribe` has changed:
+    * Old: `pubsub.subscribe(topic, [options], handler, [callback]): Promise`
+    * New: `pubsub.subscribe(topic, handler, [options], [callback]): Promise`
+2. The `pubsub.unsubscribe` method has become async meaning that it now takes a callback or returns a promise:
+    * Old: `pubsub.unsubscribe(topic, handler): undefined`
+    * New: `pubsub.unsubscribe(topic, handler, [callback]): Promise`
+3. Property names on response objects for `ping` are now lowered:
+    * Old: `{ Success, Time, Text }`
+    * New: `{ success, time, text }`
+4. In the CLI, `jsipfs object data` no longer returns a newline after the end of the returned data
+
+
+
 <a name="0.28.2"></a>
 ## [0.28.2](https://github.com/ipfs/js-ipfs/compare/v0.28.1...v0.28.2) (2018-03-14)
 

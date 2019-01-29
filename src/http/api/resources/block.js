@@ -2,10 +2,9 @@
 
 const CID = require('cids')
 const multipart = require('ipfs-multipart')
-const Block = require('ipfs-block')
-const waterfall = require('async/waterfall')
-const multihashing = require('multihashing-async')
-const Buffer = require('safe-buffer').Buffer
+const Joi = require('joi')
+const multibase = require('multibase')
+const { cidToString } = require('../../../utils/cid')
 const debug = require('debug')
 const log = debug('jsipfs:http-api:block')
 log.error = debug('jsipfs:http-api:block:error')
@@ -48,52 +47,69 @@ exports.get = {
         }).code(500)
       }
 
-      return reply(block.data)
+      if (block) {
+        return reply(block.data).header('X-Stream-Output', '1')
+      }
+
+      return reply({
+        Message: 'Block was unwanted before it could be remotely retrieved',
+        Code: 0
+      }).code(404)
     })
   }
 }
 
 exports.put = {
+  validate: {
+    query: Joi.object().keys({
+      'cid-base': Joi.string().valid(multibase.names)
+    }).unknown()
+  },
+
   // pre request handler that parses the args and returns `data` which is assigned to `request.pre.args`
   parseArgs: (request, reply) => {
     if (!request.payload) {
-      return reply("File argument 'data' is required").code(400).takeover()
+      return reply({
+        Message: "File argument 'data' is required",
+        Code: 0
+      }).code(400).takeover()
     }
 
     const parser = multipart.reqParser(request.payload)
     var file
 
     parser.on('file', (fileName, fileStream) => {
+      file = Buffer.alloc(0)
+
       fileStream.on('data', (data) => {
-        file = data
+        file = Buffer.concat([file, data])
       })
     })
 
     parser.on('end', () => {
       if (!file) {
-        return reply("File argument 'data' is required").code(400).takeover()
+        return reply({
+          Message: "File argument 'data' is required",
+          Code: 0
+        }).code(400).takeover()
       }
 
       return reply({
-        data: file.toString()
+        data: file
       })
     })
   },
 
   // main route handler which is called after the above `parseArgs`, but only if the args were valid
   handler: (request, reply) => {
-    const data = Buffer.from(request.pre.args.data)
+    const data = request.pre.args.data
     const ipfs = request.server.app.ipfs
 
-    waterfall([
-      (cb) => multihashing(data, 'sha2-256', (err, multihash) => {
-        if (err) {
-          return cb(err)
-        }
-        cb(null, new Block(data, new CID(multihash)))
-      }),
-      (block, cb) => ipfs.block.put(block, cb)
-    ], (err, block) => {
+    ipfs.block.put(data, {
+      mhtype: request.query.mhtype,
+      format: request.query.format,
+      version: request.query.version && parseInt(request.query.version)
+    }, (err, block) => {
       if (err) {
         log.error(err)
         return reply({
@@ -103,14 +119,14 @@ exports.put = {
       }
 
       return reply({
-        Key: block.cid.toBaseEncodedString(),
+        Key: cidToString(block.cid, { base: request.query['cid-base'] }),
         Size: block.data.length
       })
     })
   }
 }
 
-exports.del = {
+exports.rm = {
   // uses common parseKey method that returns a `key`
   parseArgs: exports.parseKey,
 
@@ -133,12 +149,19 @@ exports.del = {
 }
 
 exports.stat = {
+  validate: {
+    query: Joi.object().keys({
+      'cid-base': Joi.string().valid(multibase.names)
+    }).unknown()
+  },
+
   // uses common parseKey method that returns a `key`
   parseArgs: exports.parseKey,
 
   // main route handler which is called after the above `parseArgs`, but only if the args were valid
   handler: (request, reply) => {
     const key = request.pre.args.key
+
     request.server.app.ipfs.block.stat(key, (err, stats) => {
       if (err) {
         log.error(err)
@@ -149,7 +172,7 @@ exports.stat = {
       }
 
       return reply({
-        Key: stats.key,
+        Key: cidToString(stats.key, { base: request.query['cid-base'] }),
         Size: stats.size
       })
     })

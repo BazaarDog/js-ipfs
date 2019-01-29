@@ -1,6 +1,6 @@
 'use strict'
 
-const defaultNodes = require('../runtime/config-nodejs.json').Bootstrap
+const defaultConfig = require('../runtime/config-nodejs.js')
 const isMultiaddr = require('mafmt').IPFS.matches
 const promisify = require('promisify-es6')
 
@@ -23,7 +23,7 @@ module.exports = function bootstrap (self) {
         if (err) {
           return callback(err)
         }
-        callback(null, {Peers: config.Bootstrap})
+        callback(null, { Peers: config.Bootstrap })
       })
     }),
     add: promisify((multiaddr, args, callback) => {
@@ -41,7 +41,7 @@ module.exports = function bootstrap (self) {
           return callback(err)
         }
         if (args.default) {
-          config.Bootstrap = defaultNodes
+          config.Bootstrap = defaultConfig().Bootstrap
         } else if (multiaddr && config.Bootstrap.indexOf(multiaddr) === -1) {
           config.Bootstrap.push(multiaddr)
         }
@@ -51,7 +51,7 @@ module.exports = function bootstrap (self) {
           }
 
           callback(null, {
-            Peers: args.default ? defaultNodes : [multiaddr]
+            Peers: args.default ? defaultConfig().Bootstrap : [multiaddr]
           })
         })
       })
@@ -59,7 +59,7 @@ module.exports = function bootstrap (self) {
     rm: promisify((multiaddr, args, callback) => {
       if (typeof args === 'function') {
         callback = args
-        args = {all: false}
+        args = { all: false }
       }
       if (multiaddr && !isValidMultiaddr(multiaddr)) {
         return setImmediate(() => callback(invalidMultiaddrError(multiaddr)))
@@ -85,7 +85,7 @@ module.exports = function bootstrap (self) {
             res.push(multiaddr)
           }
 
-          callback(null, {Peers: res})
+          callback(null, { Peers: res })
         })
       })
     })

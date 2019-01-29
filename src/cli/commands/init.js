@@ -1,18 +1,18 @@
 'use strict'
 
-const Repo = require('ipfs-repo')
-const IPFS = require('../../core')
 const utils = require('../utils')
 const print = utils.print
 
 module.exports = {
-  command: 'init',
-
+  command: 'init [config] [options]',
   describe: 'Initialize a local IPFS node',
-
   builder (yargs) {
     return yargs
       .epilog(utils.ipfsPathHelp)
+      .positional('config', {
+        describe: 'Node config, this should JSON and will be merged with the default config. Check https://github.com/ipfs/js-ipfs#optionsconfig',
+        type: 'string'
+      })
       .option('bits', {
         type: 'number',
         alias: 'b',
@@ -24,31 +24,44 @@ module.exports = {
         type: 'boolean',
         describe: "Don't add and pin help files to the local storage"
       })
+      .option('privateKey', {
+        alias: 'k',
+        type: 'string',
+        describe: 'Pre-generated private key to use for the repo'
+      })
   },
 
   handler (argv) {
-    const path = utils.getRepoPath()
+    argv.resolve((async () => {
+      const path = utils.getRepoPath()
 
-    print(`initializing ipfs node at ${path}`)
+      print(`initializing ipfs node at ${path}`)
 
-    const node = new IPFS({
-      repo: new Repo(path),
-      init: false,
-      start: false
-    })
+      // Required inline to reduce startup time
+      const IPFS = require('../../core')
+      const Repo = require('ipfs-repo')
 
-    node.init({
-      bits: argv.bits,
-      emptyRepo: argv.emptyRepo,
-      pass: argv.pass,
-      log: print
-    }, (err) => {
-      if (err) {
+      const node = new IPFS({
+        repo: new Repo(path),
+        init: false,
+        start: false,
+        config: argv.config || {}
+      })
+
+      try {
+        await node.init({
+          bits: argv.bits,
+          privateKey: argv.privateKey,
+          emptyRepo: argv.emptyRepo,
+          pass: argv.pass,
+          log: print
+        })
+      } catch (err) {
         if (err.code === 'EACCES') {
           err.message = `EACCES: permission denied, stat $IPFS_PATH/version`
         }
         throw err
       }
-    })
+    })())
   }
 }

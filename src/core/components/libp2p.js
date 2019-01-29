@@ -1,71 +1,101 @@
 'use strict'
 
-// libp2p-nodejs gets replaced by libp2p-browser when webpacked/browserified
-const Node = require('../runtime/libp2p-nodejs')
-const promisify = require('promisify-es6')
-const get = require('lodash.get')
+const get = require('lodash/get')
+const defaultsDeep = require('@nodeutils/defaults-deep')
+const ipnsUtils = require('../ipns/routing/utils')
 
-module.exports = function libp2p (self) {
-  return {
-    start: promisify((callback) => {
-      self.config.get(gotConfig)
+module.exports = function libp2p (self, config) {
+  const options = self._options || {}
+  config = config || {}
 
-      function gotConfig (err, config) {
-        if (err) {
-          return callback(err)
-        }
+  // Always create libp2p via a bundle function
+  const createBundle = typeof options.libp2p === 'function'
+    ? options.libp2p
+    : defaultBundle
 
-        const options = {
-          mdns: get(config, 'Discovery.MDNS.Enabled'),
-          webRTCStar: get(config, 'Discovery.webRTCStar.Enabled'),
-          bootstrap: get(config, 'Bootstrap'),
-          modules: self._libp2pModules,
-          // EXPERIMENTAL
-          pubsub: get(self._options, 'EXPERIMENTAL.pubsub', false),
-          dht: get(self._options, 'EXPERIMENTAL.dht', false),
-          relay: {
-            enabled: get(self._options, 'EXPERIMENTAL.relay.enabled',
-              get(config, 'EXPERIMENTAL.relay.enabled', false)),
-            hop: {
-              enabled: get(self._options, 'EXPERIMENTAL.relay.hop.enabled',
-                get(config, 'EXPERIMENTAL.relay.hop.enabled', false)),
-              active: get(self._options, 'EXPERIMENTAL.relay.hop.active',
-                get(config, 'EXPERIMENTAL.relay.hop.active', false))
-            }
-          }
-        }
+  const { datastore } = self._repo
+  const peerInfo = self._peerInfo
+  const peerBook = self._peerInfoBook
+  const libp2p = createBundle({ options, config, datastore, peerInfo, peerBook })
+  let discoveredPeers = []
 
-        self._libp2pNode = new Node(self._peerInfo, self._peerInfoBook, options)
-
-        self._libp2pNode.on('peer:discovery', (peerInfo) => {
-          const dial = () => {
-            self._peerInfoBook.put(peerInfo)
-            self._libp2pNode.dial(peerInfo, () => {})
-          }
-          if (self.isOnline()) {
-            dial()
-          } else {
-            self._libp2pNode.once('start', dial)
-          }
-        })
-
-        self._libp2pNode.on('peer:connect', (peerInfo) => {
-          self._peerInfoBook.put(peerInfo)
-        })
-
-        self._libp2pNode.start((err) => {
-          if (err) { return callback(err) }
-
-          self._libp2pNode.peerInfo.multiaddrs.forEach((ma) => {
-            console.log('Swarm listening on', ma.toString())
-          })
-
-          callback()
-        })
-      }
-    }),
-    stop: promisify((callback) => {
-      self._libp2pNode.stop(callback)
-    })
+  const putAndDial = peerInfo => {
+    peerBook.put(peerInfo)
+    libp2p.dial(peerInfo, () => {})
   }
+
+  libp2p.on('start', () => {
+    peerInfo.multiaddrs.forEach((ma) => {
+      self._print('Swarm listening on', ma.toString())
+    })
+    discoveredPeers.forEach(putAndDial)
+    discoveredPeers = []
+  })
+
+  libp2p.on('peer:discovery', (peerInfo) => {
+    if (self.isOnline()) {
+      putAndDial(peerInfo)
+    } else {
+      discoveredPeers.push(peerInfo)
+    }
+  })
+
+  libp2p.on('peer:connect', peerInfo => peerBook.put(peerInfo))
+
+  return libp2p
+}
+
+function defaultBundle ({ datastore, peerInfo, peerBook, options, config }) {
+  const libp2pDefaults = {
+    datastore,
+    peerInfo,
+    peerBook,
+    config: {
+      peerDiscovery: {
+        mdns: {
+          enabled: get(options, 'config.Discovery.MDNS.Enabled',
+            get(config, 'Discovery.MDNS.Enabled', true))
+        },
+        webRTCStar: {
+          enabled: get(options, 'config.Discovery.webRTCStar.Enabled',
+            get(config, 'Discovery.webRTCStar.Enabled', true))
+        },
+        bootstrap: {
+          list: get(options, 'config.Bootstrap',
+            get(config, 'Bootstrap', []))
+        }
+      },
+      relay: {
+        enabled: get(options, 'relay.enabled',
+          get(config, 'relay.enabled', false)),
+        hop: {
+          enabled: get(options, 'relay.hop.enabled',
+            get(config, 'relay.hop.enabled', false)),
+          active: get(options, 'relay.hop.active',
+            get(config, 'relay.hop.active', false))
+        }
+      },
+      dht: {
+        validators: {
+          ipns: ipnsUtils.validator
+        },
+        selectors: {
+          ipns: ipnsUtils.selector
+        }
+      },
+      EXPERIMENTAL: {
+        dht: get(options, 'EXPERIMENTAL.dht', false),
+        pubsub: get(options, 'EXPERIMENTAL.pubsub', false)
+      }
+    },
+    connectionManager: get(options, 'connectionManager',
+      get(config, 'connectionManager', {}))
+  }
+
+  const libp2pOptions = defaultsDeep(get(options, 'libp2p', {}), libp2pDefaults)
+
+  // Required inline to reduce startup time
+  // Note: libp2p-nodejs gets replaced by libp2p-browser when webpacked/browserified
+  const Node = require('../runtime/libp2p-nodejs')
+  return new Node(libp2pOptions)
 }

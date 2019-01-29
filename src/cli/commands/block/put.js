@@ -1,35 +1,11 @@
 'use strict'
 
-const CID = require('cids')
-const multihashing = require('multihashing-async')
 const bl = require('bl')
 const fs = require('fs')
-const Block = require('ipfs-block')
-const waterfall = require('async/waterfall')
-const print = require('../../utils').print
-
-function addBlock (data, opts) {
-  const ipfs = opts.ipfs
-  let cid
-
-  waterfall([
-    (cb) => multihashing(data, opts.mhtype || 'sha2-256', cb),
-    (multihash, cb) => {
-      if (opts.format !== 'dag-pb' || opts.version !== 0) {
-        cid = new CID(1, opts.format || 'dag-pb', multihash)
-      } else {
-        cid = new CID(0, 'dag-pb', multihash)
-      }
-
-      ipfs.block.put(new Block(data, cid), cb)
-    }
-  ], (err) => {
-    if (err) {
-      throw err
-    }
-    print(cid.toBaseEncodedString())
-  })
-}
+const multibase = require('multibase')
+const promisify = require('promisify-es6')
+const { print } = require('../../utils')
+const { cidToString } = require('../../../utils/cid')
 
 module.exports = {
   command: 'put [block]',
@@ -52,23 +28,32 @@ module.exports = {
     },
     version: {
       describe: 'cid version',
-      type: 'number',
-      default: 0
+      type: 'number'
+    },
+    'cid-base': {
+      describe: 'Number base to display CIDs in.',
+      type: 'string',
+      choices: multibase.names
     }
   },
 
   handler (argv) {
-    if (argv.block) {
-      const buf = fs.readFileSync(argv.block)
-      return addBlock(buf, argv)
-    }
+    argv.resolve((async () => {
+      let data
 
-    process.stdin.pipe(bl((err, input) => {
-      if (err) {
-        throw err
+      if (argv.block) {
+        data = await promisify(fs.readFile)(argv.block)
+      } else {
+        data = await new Promise((resolve, reject) => {
+          process.stdin.pipe(bl((err, input) => {
+            if (err) return reject(err)
+            resolve(input)
+          }))
+        })
       }
 
-      addBlock(input, argv)
-    }))
+      const { cid } = await argv.ipfs.block.put(data, argv)
+      print(cidToString(cid, { base: argv.cidBase }))
+    })())
   }
 }

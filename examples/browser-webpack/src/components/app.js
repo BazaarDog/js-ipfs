@@ -45,22 +45,22 @@ class App extends React.Component {
         })
       })
 
-      node.files.add([Buffer.from(stringToUse)], (err, filesAdded) => {
+      node.add([Buffer.from(stringToUse)], (err, filesAdded) => {
         if (err) { throw err }
 
         const hash = filesAdded[0].hash
-        self.setState({added_file_hash: hash})
+        self.setState({ added_file_hash: hash })
 
-        node.files.cat(hash, (err, data) => {
+        node.cat(hash, (err, data) => {
           if (err) { throw err }
-          self.setState({added_file_contents: data})
+          self.setState({ added_file_contents: data.toString() })
         })
       })
     }
   }
   render () {
     return (
-      <div style={{textAlign: 'center'}}>
+      <div style={{ textAlign: 'center' }}>
         <h1>Everything is working!</h1>
         <p>Your ID is <strong>{this.state.id}</strong></p>
         <p>Your IPFS version is <strong>{this.state.version}</strong></p>

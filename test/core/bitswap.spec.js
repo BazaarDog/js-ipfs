@@ -18,15 +18,7 @@ const CID = require('cids')
 
 const IPFSFactory = require('ipfsd-ctl')
 
-// This gets replaced by '../utils/create-repo-browser.js' in the browser
-const createTempRepo = require('../utils/create-repo-nodejs.js')
-
 const IPFS = require('../../src/core')
-
-// TODO bitswap tests on windows is failing, missing proper shutdown of daemon
-// https://github.com/ipfs/js-ipfsd-ctl/pull/205
-const isWindows = require('../utils/platforms').isWindows
-const skipOnWindows = isWindows() ? describe.skip : describe
 
 function makeBlock (callback) {
   const d = Buffer.from(`IPFS is awesome ${Math.random()}`)
@@ -92,7 +84,7 @@ function addNode (fDaemon, inProcNode, callback) {
   })
 }
 
-skipOnWindows('bitswap', function () {
+describe('bitswap', function () {
   this.timeout(80 * 1000)
 
   let inProcNode // Node spawned inside this process
@@ -236,10 +228,10 @@ skipOnWindows('bitswap', function () {
         (cb) => addNode(fDaemon, inProcNode, cb),
         // 1. Add file to tmp instance
         (remote, cb) => {
-          remote.files.add([{ path: 'awesome.txt', content: file }], cb)
+          remote.add([{ path: 'awesome.txt', content: file }], cb)
         },
         // 2. Request file from local instance
-        (filesAdded, cb) => inProcNode.files.cat(filesAdded[0].hash, cb)
+        (filesAdded, cb) => inProcNode.cat(filesAdded[0].hash, cb)
       ], (err, data) => {
         expect(err).to.not.exist()
         expect(data).to.eql(file)
@@ -248,73 +240,12 @@ skipOnWindows('bitswap', function () {
     })
   })
 
-  describe('api', () => {
-    let node
-
-    before(function (done) {
-      this.timeout(40 * 1000)
-
-      node = new IPFS({
-        repo: createTempRepo(),
-        start: false,
-        config: {
-          Addresses: {
-            Swarm: []
-          },
-          Discovery: {
-            MDNS: {
-              Enabled: false
-            }
-          }
-        }
-      })
-      node.on('ready', () => done())
-    })
-
-    describe('while offline', () => {
-      it('.wantlist throws if offline', () => {
-        expect(() => node.bitswap.wantlist()).to.throw(/online/)
-      })
-
-      it('.stat gives error while offline', () => {
-        node.bitswap.stat((err, stats) => {
-          expect(err).to.exist()
-          expect(stats).to.not.exist()
-        })
-      })
-
-      it('throws if offline', () => {
-        expect(() => node.bitswap.unwant('my key')).to.throw(/online/)
-      })
-    })
-
-    describe('while online', () => {
-      before(function (done) {
-        this.timeout(80 * 1000)
-
-        node.start(() => done())
-      })
-
-      it('.wantlist returns an array of wanted blocks', () => {
-        expect(node.bitswap.wantlist()).to.eql([])
-      })
-
-      it('returns the stats', (done) => {
-        node.bitswap.stat((err, stats) => {
-          expect(err).to.not.exist()
-          expect(stats).to.have.keys([
-            'blocksReceived',
-            'blocksSent',
-            'dataReceived',
-            'dataSent',
-            'wantlist',
-            'peers',
-            'provideBufLen',
-            'dupDataReceived',
-            'dupBlksReceived'
-          ])
-          done()
-        })
+  describe('unwant', () => {
+    it('should callback with error for invalid CID input', (done) => {
+      inProcNode.bitswap.unwant('INVALID CID', (err) => {
+        expect(err).to.exist()
+        expect(err.code).to.equal('ERR_INVALID_CID')
+        done()
       })
     })
   })

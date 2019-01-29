@@ -16,20 +16,19 @@ module.exports = {
     size: {
       alias: 's',
       describe: 'size of the key to generate.',
-      default: '2048'
+      default: 2048,
+      type: 'number'
     }
   },
 
   handler (argv) {
-    const opts = {
-      type: argv.type,
-      size: argv.size
-    }
-    argv.ipfs.key.gen(argv.name, opts, (err, key) => {
-      if (err) {
-        throw err
+    argv.resolve((async () => {
+      const opts = {
+        type: argv.type,
+        size: argv.size
       }
+      const key = await argv.ipfs.key.gen(argv.name, opts)
       print(`generated ${key.id} ${key.name}`)
-    })
+    })())
   }
 }

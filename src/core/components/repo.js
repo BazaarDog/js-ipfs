@@ -23,7 +23,7 @@ module.exports = function repo (self) {
           const match = [
             /Key not found in database \[\/version\]/,
             /ENOENT/,
-            /not yet initialized/
+            /repo is not initialized yet/
           ].some((m) => {
             return m.test(err.message)
           })
@@ -38,7 +38,14 @@ module.exports = function repo (self) {
       })
     }),
 
-    gc: () => {},
+    gc: promisify((options, callback) => {
+      if (typeof options === 'function') {
+        callback = options
+        options = {}
+      }
+
+      callback(new Error('Not implemented'))
+    }),
 
     stat: promisify((options, callback) => {
       if (typeof options === 'function') {

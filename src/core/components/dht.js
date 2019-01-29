@@ -5,7 +5,9 @@ const every = require('async/every')
 const PeerId = require('peer-id')
 const CID = require('cids')
 const each = require('async/each')
+const setImmediate = require('async/setImmediate')
 // const bsplit = require('buffer-split')
+const errCode = require('err-code')
 
 module.exports = (self) => {
   return {
@@ -26,7 +28,9 @@ module.exports = (self) => {
         options = {}
       }
 
-      self._libp2pNode.dht.get(key, options.timeout, callback)
+      options = options || {}
+
+      self.libp2p.dht.get(key, options.timeout, callback)
     }),
 
     /**
@@ -46,7 +50,7 @@ module.exports = (self) => {
         return callback(new Error('Not valid key'))
       }
 
-      self._libp2pNode.dht.put(key, value, callback)
+      self.libp2p.dht.put(key, value, callback)
     }),
 
     /**
@@ -56,12 +60,30 @@ module.exports = (self) => {
      * @param {function(Error, Array<PeerInfo>)} [callback]
      * @returns {Promise<PeerInfo>|void}
      */
-    findprovs: promisify((key, callback) => {
-      if (typeof key === 'string') {
-        key = new CID(key)
+    findprovs: promisify((key, opts, callback) => {
+      if (typeof opts === 'function') {
+        callback = opts
+        opts = {}
       }
 
-      self._libp2pNode.contentRouting.findProviders(key, callback)
+      opts = opts || {}
+
+      if (typeof key === 'string') {
+        try {
+          key = new CID(key)
+        } catch (err) {
+          return setImmediate(() => callback(errCode(err, 'ERR_INVALID_CID')))
+        }
+      }
+
+      if (typeof opts === 'function') {
+        callback = opts
+        opts = {}
+      }
+
+      opts = opts || {}
+
+      self.libp2p.contentRouting.findProviders(key, opts.timeout || null, callback)
     }),
 
     /**
@@ -76,7 +98,7 @@ module.exports = (self) => {
         peer = PeerId.createFromB58String(peer)
       }
 
-      self._libp2pNode.peerRouting.findPeer(peer, (err, info) => {
+      self.libp2p.peerRouting.findPeer(peer, (err, info) => {
         if (err) {
           return callback(err)
         }
@@ -114,6 +136,8 @@ module.exports = (self) => {
         options = {}
       }
 
+      options = options || {}
+
       // ensure blocks are actually local
       every(keys, (key, cb) => {
         self._repo.blocks.has(key, cb)
@@ -130,7 +154,7 @@ module.exports = (self) => {
           // TODO: Implement recursive providing
         } else {
           each(keys, (cid, cb) => {
-            self._libp2pNode.contentRouting.provide(cid, cb)
+            self.libp2p.contentRouting.provide(cid, cb)
           }, callback)
         }
       })
@@ -149,7 +173,7 @@ module.exports = (self) => {
       }
 
       // TODO expose this method in peerRouting
-      self._libp2pNode._dht.getClosestPeers(peerId.toBytes(), (err, peerIds) => {
+      self.libp2p._dht.getClosestPeers(peerId.toBytes(), (err, peerIds) => {
         if (err) {
           return callback(err)
         }

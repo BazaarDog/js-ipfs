@@ -72,18 +72,16 @@ describe.skip('verify that kad-dht is doing its thing', () => {
 
   after((done) => parallel(nodes.map((node) => (cb) => node.stop(cb)), done))
 
-  it.skip('add a file in C, fetch through B in A', function (done) {
-    this.timeout(10 * 1000)
-
+  it.skip('add a file in C, fetch through B in A', (done) => {
     const file = {
       path: 'testfile.txt',
       content: Buffer.from('hello kad')
     }
 
-    nodeC.files.add(file, (err, filesAdded) => {
+    nodeC.add(file, (err, filesAdded) => {
       expect(err).to.not.exist()
 
-      nodeA.files.cat(filesAdded[0].hash, (err, data) => {
+      nodeA.cat(filesAdded[0].hash, (err, data) => {
         expect(err).to.not.exist()
         expect(data.length).to.equal(file.data.length)
         expect(data).to.eql(file.data)

@@ -14,19 +14,27 @@ Let us know if you find any issue or if you want to contribute and add a new tut
 - [Tutorial (Video): How to build an application with IPFS PubSub Room](https://www.youtube.com/watch?v=Nv_Teb--1zg)
 - [Tutorial (Video): How to build an Collaborative Editing Application with IPFS using CRDT](https://www.youtube.com/watch?v=-kdx8rJd8rQ)
 - [Tutorial - Understanding Circuit Relay](./circuit-relaying)
+
 ## Examples
 
 - [js-ipfs in the browser with Browserify](./browser-browserify)
+- [js-ipfs in the browser with Parcel.js](./browser-parceljs)
 - [js-ipfs in the browser with WebPack](./browser-webpack)
 - [js-ipfs in the browser with a `<script>` tag](./browser-script-tag)
 - [js-ipfs in electron](./run-in-electron)
 - [Using streams to add a directory of files to ipfs](./browser-add-readable-stream)
+- [Customizing the ipfs repository](./custom-ipfs-repo)
+- [Customizing your libp2p bundle](./custom-libp2p)
+- [Streaming video from ipfs to the browser using `ReadableStream`s](./browser-readablestream)
+- [The Mutable File System in the browser](./browser-mfs)
 
 ## Understanding the IPFS Stack
 
 In this section, you will find explanations to different pieces of IPFS Architecture and how `js-ipfs` implements them.
 
-![](../img/core.png)
+![](../img/architecture.png)
+
+[Annotated version](https://user-images.githubusercontent.com/1211152/47606420-b6265780-da13-11e8-923b-b365a8534e0e.png)
 
 > These explanations are still a work in progress
 

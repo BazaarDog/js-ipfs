@@ -41,8 +41,8 @@ describe('init', function () {
       expect(repoExistsSync('version')).to.equal(true)
 
       // Test that the following was written when init-ing the repo
-      // jsipfs files cat /ipfs/QmfGBRT6BbWJd7yUc2uYdaUZJBbnEFvTqehPFoSMQ6wgdr/readme
-      let command = out.substring(out.indexOf('files cat'), out.length - 2 /* omit the newline char */)
+      // jsipfs cat /ipfs/QmfGBRT6BbWJd7yUc2uYdaUZJBbnEFvTqehPFoSMQ6wgdr/readme
+      let command = out.substring(out.indexOf('cat'), out.length - 2 /* omit the newline char */)
       return ipfs(command)
     }).then((out) => expect(out).to.equal(readme))
   })
