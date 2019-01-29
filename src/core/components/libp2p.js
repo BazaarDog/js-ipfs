@@ -76,6 +76,8 @@ function defaultBundle ({ datastore, peerInfo, peerBook, options, config }) {
         }
       },
       dht: {
+        kBucketSize: get(options, 'dht.kBucketSize', 20),
+        enabledDiscovery: get(options, 'dht.enabledDiscovery', true),
         validators: {
           ipns: ipnsUtils.validator
         },
@@ -84,7 +86,7 @@ function defaultBundle ({ datastore, peerInfo, peerBook, options, config }) {
         }
       },
       EXPERIMENTAL: {
-        dht: get(options, 'EXPERIMENTAL.dht', false),
+        dht: !(get(options, 'local', false)),
         pubsub: get(options, 'EXPERIMENTAL.pubsub', false)
       }
     },
